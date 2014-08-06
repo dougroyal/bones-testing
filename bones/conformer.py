@@ -10,10 +10,16 @@ def suppress_mutations(bag_of_bones):
 
     for i, orig_funcdef in enumerate(bag_of_bones.funcdefs):
         norm_funcdef = FuncDef()
+        norm_funcdef.body = orig_funcdef.body
 
+        # Fix funcdef signature
         sig = _remove_heinous_characters(orig_funcdef.signature)
         sig = _prefix_test_to_tests(orig_funcdef, sig)
         norm_funcdef.signature = sig
+
+        # Fix funcdef bdd keywords
+
+
 
         new_bones.funcdefs.append(norm_funcdef)
 

@@ -7,6 +7,7 @@ class FuncDef():
     def __init__(self):
         self._closing_dedent_col = None
         self.signature = FuncDefSig()
+        # todo make body an object like FuncDefSig so I can call fn.body.line(4) rather than fn.body[4]
         self.body = {}
         self.bdd_blocks = {'then': {},
                            'where': {}}
