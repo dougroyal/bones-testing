@@ -1,11 +1,12 @@
 from token import INDENT
 
+from bones.containers.funcdef_sig import FuncDefSig
 
 class FuncDef():
 
     def __init__(self):
         self._closing_dedent_col = None
-        self.signature = []
+        self.signature = FuncDefSig()
         self.body = {}
         self.bdd_blocks = {'then': {},
                            'where': {}}

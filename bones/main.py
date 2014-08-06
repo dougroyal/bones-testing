@@ -10,7 +10,7 @@ def main():
 
     original_tokens = generate_tokens(file)
     parsed_tokens = TokenParser().parse_tokens(original_tokens)
-    pythonized_tokens = suppress_mutations(original_tokens, parsed_tokens)
+    pythonized_tokens = suppress_mutations(original_tokens, bag_of_bones=parsed_tokens)
 
 
 def _tmp_get_file():

@@ -61,7 +61,3 @@ class FuncDefTests(unittest.TestCase):
         self.assertEqual(funcdef.bdd_blocks['where'][0][0], tok0)
         self.assertEqual(funcdef.bdd_blocks['where'][0][1], tok1)
         self.assertEqual(funcdef.bdd_blocks['where'][0][2], tok2)
-
-
-if __name__ == '__main__':
-    unittest.main()
