@@ -1,9 +1,13 @@
 import re
 from token import NAME
+from tokenize import COMMENT
 
 from bones.containers.bag_of_bones import BagOfBones
+from bones.containers.bones_token import Token
 from bones.containers.funcdef import FuncDef
 
+
+from pprint import pprint
 
 def suppress_mutations(bag_of_bones):
     new_bones = BagOfBones()
@@ -18,13 +22,20 @@ def suppress_mutations(bag_of_bones):
         norm_funcdef.signature = sig
 
         # Fix funcdef bdd keywords
+        if len(orig_funcdef.bdd_blocks['then']):
+            then_kw_line_num = list(orig_funcdef.bdd_blocks['then'].keys())[0]
+            then_kw_tok = orig_funcdef.bdd_blocks['then'][then_kw_line_num][0]
+            norm_funcdef.body[then_kw_tok.line_num] = _mk_comment(then_kw_tok)
 
-
+        # for line_num in orig_funcdef.bdd_blocks['then']:
+        #     norm_funcdef.body[line_num] = _mk_comment(orig_funcdef.bdd_blocks['then'][line_num])
 
         new_bones.funcdefs.append(norm_funcdef)
 
     return new_bones
 
+def _mk_comment(tok):
+    return Token((COMMENT, '#'+tok.value, tok.start, tok.end, tok.line))
 
 def _remove_heinous_characters(sig_toks):
     sig_toks.name_tok.type = NAME

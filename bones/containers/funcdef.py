@@ -1,4 +1,5 @@
 from token import INDENT
+from collections import OrderedDict
 
 from bones.containers.funcdef_sig import FuncDefSig
 
@@ -9,8 +10,8 @@ class FuncDef():
         self.signature = FuncDefSig()
         # todo make body an object like FuncDefSig so I can call fn.body.line(4) rather than fn.body[4]
         self.body = {}
-        self.bdd_blocks = {'then': {},
-                           'where': {}}
+        self.bdd_blocks = {'then': OrderedDict(),
+                           'where': OrderedDict()}
 
     def add_body_token(self, tok):
         if tok.line_num not in self.body:

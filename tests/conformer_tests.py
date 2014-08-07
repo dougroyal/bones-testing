@@ -79,22 +79,19 @@ def im_a_regular_function():
         self.assertEqual(expected_0, actual.funcdefs[0].signature)
         self.assertEqual(expected_1, actual.funcdefs[1].signature)
 
-    @unittest.skip('')
-    def test_bdd_keywords_are_removed(self):
+    def test_bdd_keywords_are_commented_out(self):
+        # TODO, not sure if removing the tokens completely will screw up the untokenizer, so i'm leaving them in for now. Explore later.
         expected = Token((COMMENT, '#then', (2, 4), (2, 8), '    then:\n'))
         data = '''\
 def blah():
     then:
-        call_something()
+        pass
 '''
         bag_of_bones = _build_bag_of_bones(data)
 
         actual = suppress_mutations(bag_of_bones)
 
-        for i in bag_of_bones.funcdefs[0].bdd_blocks['then']:
-            pprint(bag_of_bones.funcdefs[0].bdd_blocks['then'][i])
-
-        self.assertEqual(expected, actual.funcdefs[0])
+        self.assertEqual(expected, actual.funcdefs[0].body[2])
 
     def test_funcdef_body_is_copied(self):
         LINE_TWO = 2
