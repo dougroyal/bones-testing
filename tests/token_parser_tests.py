@@ -128,7 +128,7 @@ def somefunc():
         self.assertEqual(1, len(line_4_toks))
         self.assertEqual(expected[8], line_4_toks[0])
 
-    def test_bdd_keyworkds_are_parsed_into_funcdef_parts(self):
+    def test_bdd_keywords_are_parsed_into_funcdef_parts(self):
         parser = TokenParser()
         data = '''\
 def somefunc():
@@ -137,8 +137,8 @@ def somefunc():
     then:
         a == b
 '''
-        LINE_FOUR=4
-        LINE_FIVE=5
+        LINE_FOUR = 4
+        LINE_FIVE = 5
 
         expected = [
             Token((NAME,'then', (LINE_FOUR, 4), (4, 8), '    then:\n')),
@@ -155,8 +155,8 @@ def somefunc():
 
         parsed = parser.parse_tokens(tokens)
 
-        line_4_toks = parsed.funcdefs[0].bdd_blocks['then'][LINE_FOUR]
-        line_5_toks = parsed.funcdefs[0].bdd_blocks['then'][LINE_FIVE]
+        line_4_toks = parsed.funcdefs[0].then_block[0]
+        line_5_toks = parsed.funcdefs[0].then_block[1]
 
         self.assertEqual(3, len(line_4_toks))
         self.assertEqual(expected[0], line_4_toks[0])
@@ -164,7 +164,6 @@ def somefunc():
         self.assertEqual(expected[2], line_4_toks[2])
 
         self.assertEqual(5, len(line_5_toks))
-        self.assertEqual(5, len(parsed.funcdefs[0].bdd_blocks['then'][LINE_FIVE]))
         self.assertEqual(expected[3], line_5_toks[0])
         self.assertEqual(expected[4], line_5_toks[1])
         self.assertEqual(expected[5], line_5_toks[2])

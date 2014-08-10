@@ -4,6 +4,8 @@ from token import DEDENT
 from bones.containers.bag_of_bones import BagOfBones
 from bones.containers.funcdef import FuncDef
 
+from pprint import pprint
+
 #todo maybe de-classify this
 class TokenParser:
 
@@ -34,14 +36,14 @@ class TokenParser:
 
             elif self._is_end_of_funcdef_body(tok):
                 self._in_funcdef_body = False
-                self._curr_funcdef().add_body_token(tok)
+                self._curr_funcdef().body.add_token(tok)
 
             elif self._in_funcdef_sig:
                 self._curr_funcdef().signature.append(tok)
 
             elif self._is_bdd_block_keyword(index, tok, bdd_kw='then'):
                 self._curr_bdd_block = 'then'
-                self._curr_funcdef().add_bdd_token('then', tok)
+                self._curr_funcdef().then_block.add_token(tok)
 
             elif self._is_bdd_block_keyword(index, tok, bdd_kw='where'):
                 self._curr_bdd_block = 'where'
@@ -50,12 +52,14 @@ class TokenParser:
             elif self._is_end_of_bdd_block(tok):
                 self._curr_bdd_block = None
 
-            elif self._curr_bdd_block:
-                tok.line_num
-                self._curr_funcdef().add_bdd_token(self._curr_bdd_block, tok)
+            elif self._curr_bdd_block == 'then':
+                self._curr_funcdef().then_block.add_token(tok)
+
+            elif self._curr_bdd_block == 'where':
+                self._curr_funcdef().where_block.add_token(tok)
 
             elif self._in_funcdef_body:
-                self._curr_funcdef().add_body_token(tok)
+                self._curr_funcdef().body.add_token(tok)
 
             #TODO raise exception on unknown tokens
 
