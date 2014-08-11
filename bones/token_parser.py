@@ -7,7 +7,6 @@ from bones.containers.funcdef import FuncDef
 
 def parse_tokens(tokens):
     bones = BagOfBones()
-    tokens = tokens  # set once in parse_tokens, and never change...EVER
     in_funcdef_sig = False  # Used to collect funcdef signature tokens
     in_funcdef_body = False  # ditto, but for funcdef body tokens
     curr_bdd_block = None  # ditto, but for bdd_block tokens.
@@ -20,7 +19,7 @@ def parse_tokens(tokens):
             funcdef.signature.append(tok)
             bones.funcdefs.append(funcdef)
 
-        elif in_funcdef_sig and _is_end_of_funcdef_sig(index, tok, tokens):
+        elif in_funcdef_sig and _is_end_of_funcdef_sig(tokens, index, tok):
             in_funcdef_sig = False
             in_funcdef_body = True
             _curr_funcdef(bones).signature.append(tok)
@@ -54,7 +53,7 @@ def parse_tokens(tokens):
     return bones
 
 
-def _is_end_of_funcdef_sig(index, tok, tokens):
+def _is_end_of_funcdef_sig(tokens, index, tok):
     return tok.type == NEWLINE and _prev_tok_is_a_colon(tokens, index)
 
 
