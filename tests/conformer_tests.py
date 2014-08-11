@@ -4,7 +4,7 @@ from token import NAME, OP, NEWLINE, INDENT, NUMBER
 from tokenize import COMMENT
 
 from bones.conformer import suppress_mutations
-from bones.token_parser import TokenParser
+from bones.token_parser import parse_tokens
 from bones.containers.bones_token import Token
 from tests.utils import generate_toks
 
@@ -130,4 +130,4 @@ def blah():
 
 def _build_bag_of_bones(data):
     original_tokens = generate_toks(data)
-    return TokenParser().parse_tokens(original_tokens)
+    return parse_tokens(original_tokens)

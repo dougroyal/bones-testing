@@ -4,14 +4,13 @@ from io import StringIO
 from token import NAME, OP, STRING, NEWLINE, INDENT, DEDENT, NUMBER
 
 from bones.containers.bones_token import Token
-from bones.token_parser import TokenParser
+from bones.token_parser import parse_tokens
 
 from tests.utils import generate_toks
 
 class TokenParserTests(TestCase):
 
     def test_normal_funcdef_signature_is_parsed_correctly(self):
-        parser = TokenParser()
         data = '''\
 def something(foo, bar="baz", bat=metasyntactic_generator()):
     pass
@@ -38,7 +37,7 @@ def something(foo, bar="baz", bat=metasyntactic_generator()):
             Token((NEWLINE, '\n', (1, 61), (1, 62),'def something(foo, bar="baz", bat=metasyntactic_generator()):\n')),
         ]
 
-        parsed = parser.parse_tokens(tokens)
+        parsed = parse_tokens(tokens)
 
         self.assertEqual(len(expected), len(parsed.funcdefs[0].signature))
         for i, expect in enumerate(expected):
@@ -46,7 +45,6 @@ def something(foo, bar="baz", bat=metasyntactic_generator()):
 
 
     def test_string_funcdef_signature_is_parsed_correctly(self):
-        parser = TokenParser()
         data = '''\
 def "a cool string func"(a,b=c,d="e",f=g()):
     pass
@@ -77,14 +75,13 @@ def "a cool string func"(a,b=c,d="e",f=g()):
             Token((NEWLINE, '\n', (1, 44), (1, 45), 'def "a cool string func"(a,b=c,d="e",f=g()):\n')),
         ]
 
-        parsed = parser.parse_tokens(tokens)
+        parsed = parse_tokens(tokens)
 
         self.assertEqual(len(expected), len(parsed.funcdefs[0].signature))
         for i, expect in enumerate(expected):
             self.assertEqual(expected[i], parsed.funcdefs[0].signature[i])
 
     def test_tokens_are_parsed_into_funcdef_body(self):
-        parser = TokenParser()
         data = '''\
 def somefunc():
 
@@ -104,7 +101,7 @@ def somefunc():
             Token((DEDENT, '', (4, 0), (4, 0), '')),
         ]
 
-        parsed = parser.parse_tokens(tokens)
+        parsed = parse_tokens(tokens)
 
         line_2_toks = parsed.funcdefs[0].body[2]
         line_3_toks = parsed.funcdefs[0].body[3]
@@ -130,7 +127,6 @@ def somefunc():
         self.assertEqual(expected[8], line_4_toks[0])
 
     def test_bdd_keywords_are_parsed_into_funcdef_parts(self):
-        parser = TokenParser()
         data = '''\
 def somefunc():
     this_should_not_be_found_in_a_bdd_block()
@@ -154,7 +150,7 @@ def somefunc():
         ]
         tokens = generate_toks(data)
 
-        parsed = parser.parse_tokens(tokens)
+        parsed = parse_tokens(tokens)
 
         line_4_toks = parsed.funcdefs[0].then_block[LINE_FOUR]
         line_5_toks = parsed.funcdefs[0].then_block[LINE_FIVE]
@@ -173,7 +169,6 @@ def somefunc():
 
 
     def test_tables_are_parsed_into_funcdef_parts(self):
-        parser = TokenParser()
         data = '''\
 def somefunc():
 
@@ -212,7 +207,7 @@ def somefunc():
 
         tokens = generate_toks(data)
 
-        parsed = parser.parse_tokens(tokens)
+        parsed = parse_tokens(tokens)
 
         line_6_toks = parsed.funcdefs[0].where_block[6]
         line_7_toks = parsed.funcdefs[0].where_block[7]
