@@ -7,9 +7,6 @@ from bones.containers.bones_token import Token
 from bones.containers.funcdef import FuncDef
 
 
-from pprint import pprint
-
-
 def suppress_mutations(bag_of_bones):
     new_bones = BagOfBones()
 
@@ -23,9 +20,8 @@ def suppress_mutations(bag_of_bones):
         norm_funcdef.signature = sig
 
         # Fix funcdef bdd keywords
-        if len(orig_funcdef.bdd_blocks['then']):
-            then_kw_line_num = list(orig_funcdef.bdd_blocks['then'].keys())[0]
-            then_kw_tok = orig_funcdef.bdd_blocks['then'][then_kw_line_num][0]
+        if orig_funcdef.then_block:
+            then_kw_tok = orig_funcdef.then_block.first_line[0] # First token of first line is the bdd kw
             norm_funcdef.body[then_kw_tok.line_num] = _mk_comment(then_kw_tok)
 
         # for line in orig_funcdef.then_block.lines:
@@ -50,7 +46,7 @@ def _remove_heinous_characters(sig_toks):
 
 
 def _prefix_test_to_tests(orig_fn, new_sig):
-    if len(orig_fn.bdd_blocks['then']) > 0:
+    if len(orig_fn.then_block) > 0:
         new_sig.name_tok.value = 'test_' + new_sig.name_tok.value
 
     return new_sig

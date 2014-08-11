@@ -42,21 +42,18 @@ class TokenParser:
                 self._curr_funcdef().signature.append(tok)
 
             elif self._is_bdd_block_keyword(index, tok, bdd_kw='then'):
-                self._curr_bdd_block = 'then'
-                self._curr_funcdef().then_block.add_token(tok)
+                self._curr_bdd_block = self._curr_funcdef().then_block
+                self._curr_bdd_block.add_token(tok)
 
             elif self._is_bdd_block_keyword(index, tok, bdd_kw='where'):
-                self._curr_bdd_block = 'where'
-                self._curr_funcdef().add_bdd_token('where', tok)
+                self._curr_bdd_block = self._curr_funcdef().where_block
+                self._curr_bdd_block.add_token(tok)
 
             elif self._is_end_of_bdd_block(tok):
                 self._curr_bdd_block = None
 
-            elif self._curr_bdd_block == 'then':
-                self._curr_funcdef().then_block.add_token(tok)
-
-            elif self._curr_bdd_block == 'where':
-                self._curr_funcdef().where_block.add_token(tok)
+            elif self._curr_bdd_block:
+                self._curr_bdd_block.add_token(tok)
 
             elif self._in_funcdef_body:
                 self._curr_funcdef().body.add_token(tok)
@@ -77,10 +74,13 @@ class TokenParser:
         return self._in_funcdef_body and tok.value == bdd_kw and self._next_tok_is_a_colon(index)
 
     def _is_end_of_bdd_block(self, tok):
-        if self._curr_bdd_block and tok.type == DEDENT:
-            lowest_line, *rest = self._curr_funcdef().bdd_blocks[self._curr_bdd_block]
-            block_start_col = self._curr_funcdef().bdd_blocks[self._curr_bdd_block][lowest_line][0].start_col
-            return block_start_col >= tok.start_col  # The DEDENT might go all the way to 0
+        if self._curr_bdd_block:# and tok.type == DEDENT:
+            return self._curr_bdd_block.is_closing_dedent(tok)
+            # return self._curr_bdd_block.first_line.start_col >= tok.start_col
+
+    #         lowest_line, *rest = self._curr_funcdef().bdd_blocks[self._curr_bdd_block]
+    #         block_start_col = self._curr_funcdef().bdd_blocks[self._curr_bdd_block][lowest_line][0].start_col
+    #         return block_start_col >= tok.start_col  # The DEDENT might go all the way to 0
 
     def _curr_funcdef(self):
         return self._bones.funcdefs[-1]

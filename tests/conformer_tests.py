@@ -12,23 +12,24 @@ from bones.containers.bones_token import Token
 
 
 class ConformerTests(TestCase):
+    
     def test_string_funcdefs_are_pythonified(self):
         expected_0 = [
-            Token((NAME,'def',(1, 0),(1, 3),'def "I\'m a string funcdef. Wheee!"():\n')),
-            Token((NAME,'_I_m_a_string_funcdef_Wheee_',(1, 4),(1, 34),'def "I\'m a string funcdef. Wheee!"():\n')),
-            Token((OP,'(',(1, 34),(1, 35),'def "I\'m a string funcdef. Wheee!"():\n')),
-            Token((OP,')',(1, 35),(1, 36),'def "I\'m a string funcdef. Wheee!"():\n')),
-            Token((OP,':',(1, 36),(1, 37),'def "I\'m a string funcdef. Wheee!"():\n')),
-            Token((NEWLINE,'\n',(1, 37),(1, 38),'def "I\'m a string funcdef. Wheee!"():\n')),
+            Token((NAME, 'def', (1, 0), (1, 3), 'def "I\'m a string funcdef. Wheee!"():\n')),
+            Token((NAME, '_I_m_a_string_funcdef_Wheee_', (1, 4), (1, 34), 'def "I\'m a string funcdef. Wheee!"():\n')),
+            Token((OP, '(', (1, 34), (1, 35), 'def "I\'m a string funcdef. Wheee!"():\n')),
+            Token((OP, ')', (1, 35), (1, 36), 'def "I\'m a string funcdef. Wheee!"():\n')),
+            Token((OP, ':', (1, 36), (1, 37), 'def "I\'m a string funcdef. Wheee!"():\n')),
+            Token((NEWLINE, '\n', (1, 37), (1, 38), 'def "I\'m a string funcdef. Wheee!"():\n')),
         ]
 
         expected_1 = [
-            Token((NAME,'def',(4, 0),(4, 3),'def im_a_regular_function():\n')),
-            Token((NAME,'im_a_regular_function',(4, 4),(4, 25),'def im_a_regular_function():\n')),
-            Token((OP,'(',(4, 25),(4, 26),'def im_a_regular_function():\n')),
-            Token((OP,')',(4, 26),(4, 27),'def im_a_regular_function():\n')),
-            Token((OP,':',(4, 27),(4, 28),'def im_a_regular_function():\n')),
-            Token((NEWLINE,'\n',(4, 28),(4, 29),'def im_a_regular_function():\n')),
+            Token((NAME, 'def', (4, 0), (4, 3), 'def im_a_regular_function():\n')),
+            Token((NAME, 'im_a_regular_function', (4, 4), (4, 25), 'def im_a_regular_function():\n')),
+            Token((OP, '(', (4, 25), (4, 26), 'def im_a_regular_function():\n')),
+            Token((OP, ')', (4, 26), (4, 27), 'def im_a_regular_function():\n')),
+            Token((OP, ':', (4, 27), (4, 28), 'def im_a_regular_function():\n')),
+            Token((NEWLINE, '\n', (4, 28), (4, 29), 'def im_a_regular_function():\n')),
         ]
 
         data = '''\
@@ -49,7 +50,8 @@ def im_a_regular_function():
         # note: the prefix is 'test_' not 'test'
         expected_0 = [
             Token((NAME, 'def', (1, 0), (1, 3), 'def "I\'m a string funcdef. Wheee!"():\n')),
-            Token((NAME, 'test__I_m_a_string_funcdef_Wheee_', (1,  4), (1,  34), 'def "I\'m a string funcdef. Wheee!"():\n')), 
+            Token((
+            NAME, 'test__I_m_a_string_funcdef_Wheee_', (1, 4), (1, 34), 'def "I\'m a string funcdef. Wheee!"():\n')),
             Token((OP, '(', (1, 34), (1, 35), 'def "I\'m a string funcdef. Wheee!"():\n')),
             Token((OP, ')', (1, 35), (1, 36), 'def "I\'m a string funcdef. Wheee!"():\n')),
             Token((OP, ':', (1, 36), (1, 37), 'def "I\'m a string funcdef. Wheee!"():\n')),
@@ -98,7 +100,7 @@ def blah():
         LINE_THREE = 3
         expected = {
             LINE_TWO: [
-                Token((INDENT,  '    ',  (2, 0),  (2, 4), '    dont_forget_me()\n')),
+                Token((INDENT, '    ', (2, 0), (2, 4), '    dont_forget_me()\n')),
                 Token((NAME, 'dont_forget_me', (2, 4), (2, 18), '    dont_forget_me()\n')),
                 Token((OP, '(', (2, 18), (2, 19), '    dont_forget_me()\n')),
                 Token((OP, ')', (2, 19), (2, 20), '    dont_forget_me()\n')),
@@ -111,7 +113,6 @@ def blah():
                 Token((NEWLINE, '\n', (3, 9), (3, 10), '    x = 9\n')),
             ]
         }
-
 
         data = '''\
 def blah():

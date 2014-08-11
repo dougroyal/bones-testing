@@ -155,8 +155,8 @@ def somefunc():
 
         parsed = parser.parse_tokens(tokens)
 
-        line_4_toks = parsed.funcdefs[0].then_block[0]
-        line_5_toks = parsed.funcdefs[0].then_block[1]
+        line_4_toks = parsed.funcdefs[0].then_block[LINE_FOUR]
+        line_5_toks = parsed.funcdefs[0].then_block[LINE_FIVE]
 
         self.assertEqual(3, len(line_4_toks))
         self.assertEqual(expected[0], line_4_toks[0])
@@ -213,10 +213,10 @@ def somefunc():
 
         parsed = parser.parse_tokens(tokens)
 
-        line_6_toks = parsed.funcdefs[0].bdd_blocks['where'][6]
-        line_7_toks = parsed.funcdefs[0].bdd_blocks['where'][7]
-        line_8_toks = parsed.funcdefs[0].bdd_blocks['where'][8]
-        line_9_toks = parsed.funcdefs[0].bdd_blocks['where'][9]
+        line_6_toks = parsed.funcdefs[0].where_block[6]
+        line_7_toks = parsed.funcdefs[0].where_block[7]
+        line_8_toks = parsed.funcdefs[0].where_block[8]
+        line_9_toks = parsed.funcdefs[0].where_block[9]
 
 
         # Line 3 Token tests
