@@ -3,9 +3,10 @@ from unittest import TestCase
 from io import StringIO
 from token import NAME, OP, STRING, NEWLINE, INDENT, DEDENT, NUMBER
 
-from bones.tokengenerator import Token, generate_tokens
+from bones.containers.bones_token import Token
 from bones.token_parser import TokenParser
 
+from tests.utils import generate_toks
 
 class TokenParserTests(TestCase):
 
@@ -15,7 +16,7 @@ class TokenParserTests(TestCase):
 def something(foo, bar="baz", bat=metasyntactic_generator()):
     pass
 '''
-        tokens = generate_tokens(StringIO(data))
+        tokens = generate_toks(data)
 
         expected = [
             Token((NAME, 'def', (1, 0), (1, 3), 'def something(foo, bar="baz", bat=metasyntactic_generator()):\n')),
@@ -50,7 +51,7 @@ def something(foo, bar="baz", bat=metasyntactic_generator()):
 def "a cool string func"(a,b=c,d="e",f=g()):
     pass
 '''
-        tokens = generate_tokens(StringIO(data))
+        tokens = generate_toks(data)
 
         expected = [
             Token((NAME, 'def', (1, 0), (1, 3), 'def "a cool string func"(a,b=c,d="e",f=g()):\n')),
@@ -89,7 +90,7 @@ def somefunc():
 
     foo = some_other_func_call()
 '''
-        tokens = generate_tokens(StringIO(data))
+        tokens = generate_toks(data)
 
         expected = [
             Token((55, '\n', (2, 0), (2, 1), '\n')),
@@ -151,7 +152,7 @@ def somefunc():
             Token((NAME, 'b', (LINE_FIVE, 13), (5, 14), '        a == b\n')),
             Token((NEWLINE, '\n', (LINE_FIVE, 14),(5, 15),'        a == b\n')),
         ]
-        tokens = generate_tokens(StringIO(data))
+        tokens = generate_toks(data)
 
         parsed = parser.parse_tokens(tokens)
 
@@ -209,7 +210,7 @@ def somefunc():
             Token((NEWLINE, '\n', (9, 17), (9, 18),'        3 | 4 | 4\n')),
         ]
 
-        tokens = generate_tokens(StringIO(data))
+        tokens = generate_toks(data)
 
         parsed = parser.parse_tokens(tokens)
 

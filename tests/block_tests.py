@@ -1,12 +1,9 @@
-from io import StringIO
-from pprint import pprint
 from token import DEDENT
 import unittest
 from unittest import TestCase
 
 from bones.containers.block import Block
-from bones.tokengenerator import generate_tokens
-from tests.utils import mk_tok
+from tests.utils import mk_tok, generate_toks
 
 LINE_ZERO = 0
 LINE_ONE = 1
@@ -62,7 +59,7 @@ def somefunc():
         pass
     add_some_dedent_confusion = 42
 '''
-        tokens = generate_tokens(StringIO(data))
+        tokens = generate_toks(data)
         dedents = _find_dedent_tokens(tokens)
         for tok in tokens:
             block.add_token(tok)

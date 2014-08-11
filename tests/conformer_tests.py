@@ -1,14 +1,12 @@
-import unittest
 from unittest import TestCase
 from io import StringIO
 from token import NAME, OP, NEWLINE, INDENT, NUMBER
 from tokenize import COMMENT
-from pprint import pprint
 
 from bones.conformer import suppress_mutations
-from bones.tokengenerator import generate_tokens
 from bones.token_parser import TokenParser
 from bones.containers.bones_token import Token
+from tests.utils import generate_toks
 
 
 class ConformerTests(TestCase):
@@ -131,5 +129,5 @@ def blah():
 
 
 def _build_bag_of_bones(data):
-    original_tokens = generate_tokens(StringIO(data))
+    original_tokens = generate_toks(data)
     return TokenParser().parse_tokens(original_tokens)
