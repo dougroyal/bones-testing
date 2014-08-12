@@ -5,7 +5,6 @@ Setup stuff to quickly look at output from tokenize module
 from tokenize import generate_tokens
 from io import StringIO
 from token import INDENT, DEDENT
-from pprint import pprint
 
 data = '''\
 def something():

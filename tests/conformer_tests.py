@@ -1,5 +1,4 @@
-from unittest import TestCase
-from io import StringIO
+from unittest import TestCase, skip
 from token import NAME, OP, NEWLINE, INDENT, NUMBER
 from tokenize import COMMENT
 
@@ -10,7 +9,6 @@ from tests.utils import generate_toks
 
 
 class ConformerTests(TestCase):
-    
     def test_string_funcdefs_are_pythonified(self):
         expected_0 = [
             Token((NAME, 'def', (1, 0), (1, 3), 'def "I\'m a string funcdef. Wheee!"():\n')),
@@ -49,7 +47,8 @@ def im_a_regular_function():
         expected_0 = [
             Token((NAME, 'def', (1, 0), (1, 3), 'def "I\'m a string funcdef. Wheee!"():\n')),
             Token((
-            NAME, 'test__I_m_a_string_funcdef_Wheee_', (1, 4), (1, 34), 'def "I\'m a string funcdef. Wheee!"():\n')),
+                NAME, 'test__I_m_a_string_funcdef_Wheee_', (1, 4), (1, 34),
+                'def "I\'m a string funcdef. Wheee!"():\n')),
             Token((OP, '(', (1, 34), (1, 35), 'def "I\'m a string funcdef. Wheee!"():\n')),
             Token((OP, ')', (1, 35), (1, 36), 'def "I\'m a string funcdef. Wheee!"():\n')),
             Token((OP, ':', (1, 36), (1, 37), 'def "I\'m a string funcdef. Wheee!"():\n')),
@@ -126,6 +125,34 @@ def blah():
 
         self.assertEqual(expected[LINE_TWO], actual.funcdefs[0].body[LINE_TWO])
         self.assertEqual(expected[LINE_THREE], actual.funcdefs[0].body[LINE_THREE])
+
+    def test_bdd_blocks_are_dedented(self):
+        # given
+        data = '''\
+def blah():
+    then:
+        foo == bar
+        bat == baz
+'''
+        bag_of_bones = _build_bag_of_bones(data)
+        expected = {
+            3: {0: Token((INDENT, '    ', (3, 0), (3, 4), '    foo == bar\n')),
+                1: Token((NAME, 'foo', (3, 4), (3, 7), '    foo == bar\n')),
+                2: Token((OP, '==', (3, 8), (3, 10), '    foo == bar\n')),
+                3: Token((NAME, 'bar', (3, 11), (3, 14), '    foo == bar\n')),
+                4: Token((NEWLINE, '\n', (3, 14), (3, 15), '    foo == bar\n'))},
+            4: {0: Token((NAME, 'bat', (4, 4), (4, 7), '    bat == baz\n')),
+                1: Token((OP, '==', (4, 8), (4, 10), '    bat == baz\n')),
+                2: Token((NAME, 'baz', (4, 11), (4, 14), '    bat == baz\n')),
+                3: Token((NEWLINE, '\n', (4, 14), (4, 15), '    bat == baz\n'))}
+        }
+
+        # when
+        actual = suppress_mutations(bag_of_bones)
+
+        # then
+        self.assertEqual(expected[3], actual.funcdefs[0].body[3])
+        self.assertEqual(expected[4], actual.funcdefs[0].body[4])
 
 
 def _build_bag_of_bones(data):

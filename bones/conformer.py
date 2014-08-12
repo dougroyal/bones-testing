@@ -1,5 +1,5 @@
 import re
-from token import NAME
+from token import NAME, INDENT
 from tokenize import COMMENT
 
 from bones.containers.bag_of_bones import BagOfBones
@@ -21,19 +21,40 @@ def suppress_mutations(bag_of_bones):
 
         # Fix funcdef bdd keywords
         if orig_funcdef.then_block:
-            then_kw_tok = orig_funcdef.then_block.first_line[0] # First token of first line is the bdd kw
-            norm_funcdef.body[then_kw_tok.line_num] = _mk_comment(then_kw_tok)
-
-        # for line in orig_funcdef.then_block.lines:
-        #     norm_funcdef.body.append(_mk_assert_stmts(line))
-
-        # for line_num in orig_funcdef.bdd_blocks['then']:
-        #     norm_funcdef.body[line_num] = _mk_comment(orig_funcdef.bdd_blocks['then'][line_num])
+            new_lines = _transform_then_block_to_python(orig_funcdef.then_block)
+            norm_funcdef.body.update(new_lines)
 
         new_bones.funcdefs.append(norm_funcdef)
 
     return new_bones
 
+def _transform_then_block_to_python(then_block):
+    pythonified = {}
+    line_numbers = iter(then_block)
+
+    # Comment out the first line, because it's the bdd keyword label token.
+    first_line_num = next(line_numbers)
+    first_tok = then_block[first_line_num][0]
+    indent_size = first_tok.start_col
+    pythonified[first_line_num] = _mk_comment(first_tok)
+
+    # Dedent the rest of the line tokens
+    for line_num in line_numbers:
+        new_line = {}
+        for index, tok in enumerate(then_block[line_num]):
+            new_line[index] = _dedent(indent_size, tok)
+        pythonified[line_num] = new_line
+
+    return pythonified
+
+def _dedent(indent_size, tok):
+    new_value = tok.value[:indent_size] if (tok.type == INDENT) else tok.value
+    new_start_col = tok.start[1] if (tok.type == INDENT) else tok.start[1] - indent_size
+    new_start = (tok.start[0], new_start_col)
+    new_end = (tok.end[0], tok.end[1] - indent_size)
+    new_line = tok.line[indent_size:]
+
+    return Token((tok.type, new_value, new_start, new_end, new_line))
 
 def _mk_comment(tok):
     return Token((COMMENT, '#'+tok.value, tok.start, tok.end, tok.line))

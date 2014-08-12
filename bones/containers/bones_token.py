@@ -22,7 +22,7 @@ class Token():
 
     def __repr__(self):
         # print something that can be used in tests
-        return 'Token(({},{!r},{!r},{!r},{!r})),'.format(tok_name[self.type], self.value, self.start, self.end, self.line)
+        return 'Token(({},{!r},{!r},{!r},{!r}))'.format(tok_name[self.type], self.value, self.start, self.end, self.line)
 
     def __eq__(self, other):
         # results = [self.__dict__[member] != other.__dict__[member] for member in self.__dict__.keys()]
