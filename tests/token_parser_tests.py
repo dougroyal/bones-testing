@@ -44,6 +44,7 @@ def something(foo, bar="baz", bat=metasyntactic_generator()):
 
 
     def test_string_funcdef_signature_is_parsed_correctly(self):
+        # given
         data = '''\
 def "a cool string func"(a,b=c,d="e",f=g()):
     pass
@@ -74,22 +75,21 @@ def "a cool string func"(a,b=c,d="e",f=g()):
             Token((NEWLINE, '\n', (1, 44), (1, 45), 'def "a cool string func"(a,b=c,d="e",f=g()):\n')),
         ]
 
+        # when
         parsed = parse_tokens(tokens)
 
-        self.assertEqual(len(expected), len(parsed.funcdefs[0].signature))
-        for i, expect in enumerate(expected):
-            self.assertEqual(expected[i], parsed.funcdefs[0].signature[i])
+        # then
+        self.assertEqual(expected, parsed.funcdefs[0].signature)
 
     def test_tokens_are_parsed_into_funcdef_body(self):
+        # given
         data = '''\
 def somefunc():
 
     foo = some_other_func_call()
 '''
-        tokens = generate_toks(data)
-
-        expected = [
-            Token((55, '\n', (2, 0), (2, 1), '\n')),
+        expected_line_2 = [Token((55, '\n', (2, 0), (2, 1), '\n')),]
+        expected_line_3 = [
             Token((INDENT, '    ', (3, 0), (3, 4), '    foo = some_other_func_call()\n')),
             Token((NAME, 'foo', (3, 4), (3, 7), '    foo = some_other_func_call()\n')),
             Token((OP, '=', (3, 8), (3, 9), '    foo = some_other_func_call()\n')),
@@ -97,35 +97,28 @@ def somefunc():
             Token((OP, '(', (3, 30), (3, 31), '    foo = some_other_func_call()\n')),
             Token((OP, ')', (3, 31), (3, 32), '    foo = some_other_func_call()\n')),
             Token((NEWLINE, '\n', (3, 32), (3, 33), '    foo = some_other_func_call()\n')),
-            Token((DEDENT, '', (4, 0), (4, 0), '')),
         ]
+        expected_line_4 = [Token((DEDENT, '', (4, 0), (4, 0), ''))]
+        tokens = generate_toks(data)
 
+        # when
         parsed = parse_tokens(tokens)
 
-        line_2_toks = parsed.funcdefs[0].body[2]
-        line_3_toks = parsed.funcdefs[0].body[3]
-        line_4_toks = parsed.funcdefs[0].body[4]
+        # then
+        # line 2 Token tests
+        actual_line_2 = parsed.funcdefs[0].body[2]
+        self.assertEqual(expected_line_2, actual_line_2)
 
+        # line 3 Token tests
+        actual_line_3 = parsed.funcdefs[0].body[3]
+        self.assertEqual(expected_line_3, actual_line_3)
 
-        # Line 2 Token tests
-        self.assertEqual(1, len(line_2_toks))
-        self.assertEqual(expected[0], line_2_toks[0])
-
-        # Line 3 Token tests
-        self.assertEqual(7, len(line_3_toks))
-        self.assertEqual(expected[1], line_3_toks[0])
-        self.assertEqual(expected[2], line_3_toks[1])
-        self.assertEqual(expected[3], line_3_toks[2])
-        self.assertEqual(expected[4], line_3_toks[3])
-        self.assertEqual(expected[5], line_3_toks[4])
-        self.assertEqual(expected[6], line_3_toks[5])
-        self.assertEqual(expected[7], line_3_toks[6])
-
-        # Line 4 Token tests
-        self.assertEqual(1, len(line_4_toks))
-        self.assertEqual(expected[8], line_4_toks[0])
+        # line 4 Token tests
+        actual_line_4 = parsed.funcdefs[0].body[4]
+        self.assertEqual(expected_line_4, actual_line_4)
 
     def test_bdd_keywords_are_parsed_into_funcdef_parts(self):
+        # given
         data = '''\
 def somefunc():
     this_should_not_be_found_in_a_bdd_block()
@@ -136,11 +129,12 @@ def somefunc():
         LINE_FOUR = 4
         LINE_FIVE = 5
 
-        expected = [
+        expected_line_4 = [
             Token((NAME,'then', (LINE_FOUR, 4), (4, 8), '    then:\n')),
             Token((OP, ':', (LINE_FOUR, 8), (4, 9), '    then:\n')),
             Token((NEWLINE, '\n', (LINE_FOUR, 9), (4, 10), '    then:\n')),
-
+        ]
+        expected_line_5 = [
             Token((INDENT, '        ', (LINE_FIVE, 0), (5, 8), '        a == b\n')),
             Token((NAME, 'a', (LINE_FIVE, 8), (5, 9), '        a == b\n')),
             Token((OP, '==', (LINE_FIVE, 10), (5, 12), '        a == b\n')),
@@ -149,23 +143,15 @@ def somefunc():
         ]
         tokens = generate_toks(data)
 
+        # when
         parsed = parse_tokens(tokens)
 
-        line_4_toks = parsed.funcdefs[0].then_block[LINE_FOUR]
-        line_5_toks = parsed.funcdefs[0].then_block[LINE_FIVE]
+        # then
+        actual_line_4 = parsed.funcdefs[0].then_block[LINE_FOUR]
+        actual_line_5 = parsed.funcdefs[0].then_block[LINE_FIVE]
 
-        self.assertEqual(3, len(line_4_toks))
-        self.assertEqual(expected[0], line_4_toks[0])
-        self.assertEqual(expected[1], line_4_toks[1])
-        self.assertEqual(expected[2], line_4_toks[2])
-
-        self.assertEqual(5, len(line_5_toks))
-        self.assertEqual(expected[3], line_5_toks[0])
-        self.assertEqual(expected[4], line_5_toks[1])
-        self.assertEqual(expected[5], line_5_toks[2])
-        self.assertEqual(expected[6], line_5_toks[3])
-        self.assertEqual(expected[7], line_5_toks[4])
-
+        self.assertEqual(expected_line_4, actual_line_4)
+        self.assertEqual(expected_line_5, actual_line_5)
 
     def test_tables_are_parsed_into_funcdef_parts(self):
         data = '''\
