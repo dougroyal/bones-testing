@@ -10,6 +10,7 @@ from tests.utils import generate_toks
 class TokenParserTests(TestCase):
 
     def test_normal_funcdef_signature_is_parsed_correctly(self):
+        # given
         data = '''\
 def something(foo, bar="baz", bat=metasyntactic_generator()):
     pass
@@ -36,11 +37,11 @@ def something(foo, bar="baz", bat=metasyntactic_generator()):
             Token((NEWLINE, '\n', (1, 61), (1, 62),'def something(foo, bar="baz", bat=metasyntactic_generator()):\n')),
         ]
 
+        # when
         parsed = parse_tokens(tokens)
 
-        self.assertEqual(len(expected), len(parsed.funcdefs[0].signature))
-        for i, expect in enumerate(expected):
-            self.assertEqual(expected[i], parsed.funcdefs[0].signature[i])
+        # then
+        self.assertEqual(expected, parsed.funcdefs[0].signature)
 
 
     def test_string_funcdef_signature_is_parsed_correctly(self):
@@ -105,17 +106,9 @@ def somefunc():
         parsed = parse_tokens(tokens)
 
         # then
-        # line 2 Token tests
-        actual_line_2 = parsed.funcdefs[0].body[2]
-        self.assertEqual(expected_line_2, actual_line_2)
-
-        # line 3 Token tests
-        actual_line_3 = parsed.funcdefs[0].body[3]
-        self.assertEqual(expected_line_3, actual_line_3)
-
-        # line 4 Token tests
-        actual_line_4 = parsed.funcdefs[0].body[4]
-        self.assertEqual(expected_line_4, actual_line_4)
+        self.assertEqual(expected_line_2, parsed.funcdefs[0].body[2])
+        self.assertEqual(expected_line_3, parsed.funcdefs[0].body[3])
+        self.assertEqual(expected_line_4, parsed.funcdefs[0].body[4])
 
     def test_bdd_keywords_are_parsed_into_funcdef_parts(self):
         # given
@@ -147,13 +140,11 @@ def somefunc():
         parsed = parse_tokens(tokens)
 
         # then
-        actual_line_4 = parsed.funcdefs[0].then_block[LINE_FOUR]
-        actual_line_5 = parsed.funcdefs[0].then_block[LINE_FIVE]
-
-        self.assertEqual(expected_line_4, actual_line_4)
-        self.assertEqual(expected_line_5, actual_line_5)
+        self.assertEqual(expected_line_4, parsed.funcdefs[0].then_block[LINE_FOUR])
+        self.assertEqual(expected_line_5, parsed.funcdefs[0].then_block[LINE_FIVE])
 
     def test_tables_are_parsed_into_funcdef_parts(self):
+        # given
         data = '''\
 def somefunc():
 
@@ -165,10 +156,12 @@ def somefunc():
         1 | 2 | 2
         3 | 4 | 4
 '''
-        expected = [
+        expected_6 = [
             Token((NAME, 'where', (6, 4), (6, 9), '    where:\n')),
             Token((OP, ':', (6, 9), (6, 10), '    where:\n')),
             Token((NEWLINE, '\n', (6, 10), (6, 11), '    where:\n')),
+        ]
+        expected_7 = [
             Token((INDENT, '        ', (7, 0), (7, 8), '        a | b | c\n')),
             Token((NAME, 'a', (7, 8), (7, 9), '        a | b | c\n')),
             Token((OP, '|', (7, 10), (7, 11), '        a | b | c\n')),
@@ -176,12 +169,16 @@ def somefunc():
             Token((OP, '|', (7, 14), (7, 15), '        a | b | c\n')),
             Token((NAME, 'c', (7, 16), (7, 17), '        a | b | c\n')),
             Token((NEWLINE, '\n', (7, 17), (7, 18), '        a | b | c\n')),
+        ]
+        expected_8 = [
             Token((NUMBER, '1', (8, 8), (8, 9), '        1 | 2 | 2\n')),
             Token((OP, '|', (8, 10), (8, 11), '        1 | 2 | 2\n')),
             Token((NUMBER, '2', (8, 12), (8, 13), '        1 | 2 | 2\n')),
             Token((OP, '|', (8, 14), (8, 15), '        1 | 2 | 2\n')),
             Token((NUMBER, '2', (8, 16), (8, 17), '        1 | 2 | 2\n')),
             Token((NEWLINE, '\n', (8, 17), (8, 18), '        1 | 2 | 2\n')),
+        ]
+        expected_9 = [
             Token((NUMBER, '3', (9, 8), (9, 9), '        3 | 4 | 4\n')),
             Token((OP, '|', (9, 10), (9, 11), '        3 | 4 | 4\n')),
             Token((NUMBER, '4', (9, 12), (9, 13), '        3 | 4 | 4\n')),
@@ -189,50 +186,16 @@ def somefunc():
             Token((NUMBER, '4', (9, 16), (9, 17), '        3 | 4 | 4\n')),
             Token((NEWLINE, '\n', (9, 17), (9, 18),'        3 | 4 | 4\n')),
         ]
-
         tokens = generate_toks(data)
 
+        # when
         parsed = parse_tokens(tokens)
 
-        line_6_toks = parsed.funcdefs[0].where_block[6]
-        line_7_toks = parsed.funcdefs[0].where_block[7]
-        line_8_toks = parsed.funcdefs[0].where_block[8]
-        line_9_toks = parsed.funcdefs[0].where_block[9]
-
-
-        # Line 3 Token tests
-        self.assertEqual(3, len(line_6_toks))
-        self.assertEqual(expected[0], line_6_toks[0])
-        self.assertEqual(expected[1], line_6_toks[1])
-        self.assertEqual(expected[2], line_6_toks[2])
-
-        # Line 7 Token tests
-        self.assertEqual(7, len(line_7_toks))
-        self.assertEqual(expected[3], line_7_toks[0])
-        self.assertEqual(expected[4], line_7_toks[1])
-        self.assertEqual(expected[5], line_7_toks[2])
-        self.assertEqual(expected[6], line_7_toks[3])
-        self.assertEqual(expected[7], line_7_toks[4])
-        self.assertEqual(expected[8], line_7_toks[5])
-        self.assertEqual(expected[9], line_7_toks[6])
-
-        # Line 8 Token tests
-        self.assertEqual(6, len(line_8_toks))
-        self.assertEqual(expected[10], line_8_toks[0])
-        self.assertEqual(expected[11], line_8_toks[1])
-        self.assertEqual(expected[12], line_8_toks[2])
-        self.assertEqual(expected[13], line_8_toks[3])
-        self.assertEqual(expected[14], line_8_toks[4])
-        self.assertEqual(expected[15], line_8_toks[5])
-
-        # Line 9 Token tests
-        self.assertEqual(6, len(line_9_toks))
-        self.assertEqual(expected[16], line_9_toks[0])
-        self.assertEqual(expected[17], line_9_toks[1])
-        self.assertEqual(expected[18], line_9_toks[2])
-        self.assertEqual(expected[19], line_9_toks[3])
-        self.assertEqual(expected[20], line_9_toks[4])
-        self.assertEqual(expected[21], line_9_toks[5])
+        # then
+        self.assertEqual(expected_6, parsed.funcdefs[0].where_block[6])
+        self.assertEqual(expected_7, parsed.funcdefs[0].where_block[7])
+        self.assertEqual(expected_8, parsed.funcdefs[0].where_block[8])
+        self.assertEqual(expected_9, parsed.funcdefs[0].where_block[9])
 
 
 if __name__ == '__main__':
