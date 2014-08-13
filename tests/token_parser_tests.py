@@ -1,6 +1,5 @@
 import unittest
 from unittest import TestCase
-from io import StringIO
 from token import NAME, OP, STRING, NEWLINE, INDENT, DEDENT, NUMBER
 
 from bones.containers.bones_token import Token
