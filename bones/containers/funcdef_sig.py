@@ -1,6 +1,7 @@
 
 
 class FuncDefSig(list):
+    #TODO if funcdef were are Block, a signature would simply be the first line of the block ... so do that.
 
     @property
     def name_tok(self):

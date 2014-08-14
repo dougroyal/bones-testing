@@ -6,6 +6,7 @@ from bones.containers.block import Block
 
 
 class FuncDef():
+    # TODO a funcdef should be a type of Block
 
     def __init__(self):
         self._closing_dedent_col = None

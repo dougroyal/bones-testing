@@ -3,7 +3,7 @@ import unittest
 from token import NAME, OP, NEWLINE, INDENT, NUMBER, STRING
 from tokenize import COMMENT
 
-from bones.conformer import suppress_mutations#, _extract_operands
+from bones.conformer import suppress_mutations
 from bones.token_parser import parse_tokens
 from bones.containers.bones_token import Token
 from tests.utils import generate_toks
