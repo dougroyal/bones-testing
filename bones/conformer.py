@@ -21,6 +21,7 @@ def suppress_mutations(bag_of_bones):
         norm_funcdef.signature = sig
 
         # Fix funcdef bdd keywords
+        # TODO no reason for the if block
         if orig_funcdef.then_block:
             new_lines = _transform_then_block_to_python(orig_funcdef.then_block)
             norm_funcdef.body.update(new_lines)
@@ -29,83 +30,49 @@ def suppress_mutations(bag_of_bones):
 
     return new_bones
 
+
 def _transform_then_block_to_python(then_block):
     pythonified = {}
     line_numbers = iter(then_block)
 
     # Comment out the first line, because it's the bdd keyword label token.
+    # TODO do i have to do this? can I just not include it, and decrement the lines that come after it?
     first_line_num = next(line_numbers)
     first_tok = then_block[first_line_num][0]
     indent_size = first_tok.start_col
     pythonified[first_line_num] = _mk_comment(first_tok)
 
-    # Dedent the rest of the line tokens
     for line_num in line_numbers:
-        lvalue, rvalue = _extract_operands(then_block[line_num])
-        new_line = {}
-        for index, tok in enumerate(then_block[line_num]):
-            new_line[index] = _dedent(indent_size, tok)
-        pythonified[line_num] = new_line
+        new_line = _prepend_assert_to_line(then_block[line_num])
+        pythonified[line_num] = _correct_line_metadata(indent_size, new_line)
 
     return pythonified
 
 
-def _extract_operands(line):
-    lvalue = []
-    rvalue = []
-    current_side = lvalue
+def _prepend_assert_to_line(line):
+    # If the first token of this line is an indent, which it will be for the first line after a bdd kw,
+    # then the insert index is 1, if the first token is not and INDENT, then the insert point is 0
+    # def foo():
+    #     then:
+    #         w == x # This line WILL have an INDENT token
+    #         y == z # This line WILL NOT have an INDENT token
+    insert_index = 1 if line[0].type == INDENT else 0
+    line.insert(insert_index, Token((NAME, 'assert ', (line[0].line_num, 0), (line[0].line_num, 0), '')))
+    return line
+
+
+def _correct_line_metadata(indent_size, line):
+    new_line = []
+    curr_col = 0 if line[0].type == INDENT else indent_size
     for tok in line:
-        if tok.type == INDENT or tok.type == NEWLINE:
-            continue
-        elif tok.type == OP and tok.value == '==':
-            current_side = rvalue
-        else:
-            current_side.append(tok)
-    return lvalue, rvalue
+       new_line.append(_dedent(indent_size, curr_col, tok))
+       curr_col = new_line[-1].end[1]
 
+    line_string = build_line(new_line)
+    for tok in new_line:
+        tok.line = line_string
 
-def _build_assertEquals_tokens(line_num, indent_size, lvalue, rvalue):
-    prefix = _build_assertEquals_prefix(indent_size, line_num)
-    lvalue, curr_col = _build_lvalue(indent_size, line_num, lvalue)
-    operator = [Token((OP, ',', (line_num, curr_col), (line_num, curr_col+1), None))]
-    rvalue, curr_col = _build_rvalue(lvalue, curr_col, line_num, rvalue)
-    postfix = _build_assertEquals_postfix(curr_col, line_num)
-
-    return _add_line_str_tok_tokens(prefix, lvalue, operator, rvalue, postfix)
-
-
-def _build_assertEquals_prefix(indent_size, line_num):
-    return [
-        Token((INDENT, ' ' * indent_size, (line_num, 0), (line_num, indent_size), None)),
-        Token((NAME, 'self', (line_num, indent_size), (line_num, indent_size + 4), None)),
-        Token((OP, '.', (line_num, indent_size + 4), (line_num, indent_size + 5), None)),
-        Token((NAME, 'assertEqual', (line_num, indent_size + 5), (line_num, indent_size + 16), None)),
-        Token((OP, '(', (line_num, indent_size + 16), (line_num, indent_size + 17), None))]
-
-
-def _build_lvalue(indent_size, line_num, lvalue):
-    curr_col = indent_size + len('self.assertEqual(')
-    new_lvalue = []
-    for tok in lvalue:
-        next_col = curr_col+len(tok.value)
-        new_lvalue.append(Token((tok.type, tok.value, (line_num, curr_col), (line_num, next_col), None)))
-        curr_col = next_col
-    return new_lvalue, curr_col
-
-def _build_rvalue(lvalue, curr_col, line_num, rvalue):
-    curr_col += len(build_line(lvalue)) - 1
-    new_rvalue = []
-    for tok in rvalue:
-        next_col = curr_col+len(tok.value)
-        new_rvalue.append(Token((tok.type, tok.value, (line_num, curr_col), (line_num, next_col), None)))
-        curr_col = next_col
-    return new_rvalue, curr_col
-
-def _build_assertEquals_postfix(curr_col, line_num):
-    return [
-        Token((OP, ')', (line_num, curr_col), (line_num, curr_col + 1), None)),
-        Token((NEWLINE, '\n', (line_num, curr_col + 1), (line_num, curr_col + 2), None))
-    ]
+    return new_line
 
 
 def _add_line_str_tok_tokens(prefix, lvalue, operator, rvalue, postfix):
@@ -116,14 +83,14 @@ def _add_line_str_tok_tokens(prefix, lvalue, operator, rvalue, postfix):
     return line_toks
 
 
-def _dedent(indent_size, tok):
-    new_value = tok.value[:indent_size] if (tok.type == INDENT) else tok.value
-    new_start_col = tok.start[1] if (tok.type == INDENT) else tok.start[1] - indent_size
-    new_start = (tok.start[0], new_start_col)
-    new_end = (tok.end[0], tok.end[1] - indent_size)
-    new_line = tok.line[indent_size:]
+def _dedent(indent_size, curr_col, tok):
+     new_value = ' '*indent_size if (tok.type == INDENT) else tok.value
+     new_start_col = (tok.start[1]) if (tok.type == INDENT) else curr_col
+     new_start = (tok.start[0], new_start_col)
+     new_end = (tok.end[0], len(new_value)+curr_col)
 
-    return Token((tok.type, new_value, new_start, new_end, new_line))
+     return Token((tok.type, new_value, new_start, new_end, ''))
+
 
 def _mk_comment(tok):
     return Token((COMMENT, '#'+tok.value, tok.start, tok.end, tok.line))
