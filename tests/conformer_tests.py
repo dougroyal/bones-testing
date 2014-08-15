@@ -78,7 +78,7 @@ def im_a_regular_function():
 
     def test_bdd_keywords_are_commented_out(self):
         # TODO, not sure if removing the tokens completely will screw up the untokenizer, so i'm leaving them in for now. Explore later.
-        expected = Token((COMMENT, '#then', (2, 4), (2, 8), '    then:\n'))
+        expected = [Token((COMMENT, '#then', (2, 4), (2, 8), '    then:\n'))]
         data = '''\
 def blah():
     then:

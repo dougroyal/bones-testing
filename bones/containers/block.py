@@ -2,11 +2,13 @@ from collections import OrderedDict
 from token import DEDENT
 
 
-class Block(OrderedDict):
+class Block(dict):
     """
     A container to hold a ordered dictionary of Tokens with helpers.
     Tokens are grouped by line number. -- the dict key is token line number
     """
+
+    #TODO override the iterator to ensure the iterator loops over the line keys in the correct order.
 
     def add_token(self, tok):
         if tok.line_num not in self:

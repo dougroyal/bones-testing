@@ -1,0 +1,36 @@
+Metadata-Version: 1.1
+Name: bones-testing
+Version: 0.0.1
+Summary: A behavior-driven testing framework
+Home-page: http://houseofquark.com/bones-testing
+Author: Doug Royal
+Author-email: douglasroyal@gmail.com
+License: Python Software Foundation License
+Description: A behavior-driven testing framework for Python.
+        
+        The framework extends the Python to make writing testing simpler.
+        
+        Here's a basic example of how tests will be written (when the framework is done).
+        
+        ::
+        
+            def 'when {a} plus {b} then {c}'():
+                given:
+                    some_setup()
+        
+                when:
+                    a | b | c
+                    1 | 1 | 2
+                    2 | 2 | 4
+                    3 | 3 | 100 
+        
+                then:
+                    a + b == c
+        
+        This framework is based on Groovy's Spock.
+        
+Keywords: test
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Topic :: Software Development :: Testing
+Classifier: License :: OSI Approved :: Python Software Foundation License

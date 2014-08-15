@@ -9,7 +9,9 @@ from bones.utils import unparser
 
 def dump_ast(source):
     a = ast.parse(source)
+    print('#'*80)
     pprint(ast.dump(a))
+    print('#'*80)
 
 
 def exec_ast(node):
@@ -36,7 +38,7 @@ import unittest
 class AwesomeTests(unittest.TestCase):
     def test_something(self):
         print('running hi')
-        self.assertEqual('hi', 'hi')
+        self.assertEqual(xxxxxxxxxxxxxxxx, y)
 
 test_suite = unittest.TestSuite()
 test_suite.addTest(unittest.makeSuite(AwesomeTests))
@@ -44,10 +46,10 @@ runner=unittest.TextTestRunner()
 runner.run(test_suite)
     '''
 
-    source = '''\
-def test_something(self):
-    print('hi')
-'''
+#     source = '''\
+# def test_something(self):
+#     print('hi')
+# '''
     dump_ast(source)
     # exec_ast(ast.parse(source))
     # unparse_ast(ast.parse(source))

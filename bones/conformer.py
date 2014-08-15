@@ -40,7 +40,7 @@ def _transform_then_block_to_python(then_block):
     first_line_num = next(line_numbers)
     first_tok = then_block[first_line_num][0]
     indent_size = first_tok.start_col
-    pythonified[first_line_num] = _mk_comment(first_tok)
+    pythonified[first_line_num] = [_mk_comment(first_tok)]
 
     for line_num in line_numbers:
         new_line = _prepend_assert_to_line(then_block[line_num])
