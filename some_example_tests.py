@@ -3,3 +3,9 @@ def "i like string function names because they're easy to read and write"():
 
     then:
         x == y
+
+def "more tests"():
+    x=y=0
+
+    then:
+        x == y

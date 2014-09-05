@@ -1,7 +1,8 @@
 from unittest import TestCase
 import unittest
 from token import NAME, OP, NEWLINE, INDENT, NUMBER, STRING
-from tokenize import COMMENT
+from tokenize import COMMENT, NL
+from pprint import pprint
 
 from bones.conformer import suppress_mutations
 from bones.token_parser import parse_tokens
@@ -130,6 +131,12 @@ def blah():
     then:
         foo == bar(bat='baz')
         poo == far(fat=wowzer())
+
+def blaaa():
+    then:
+        foo == bar(bat='baz')
+        poo == far(fat=wowzer())
+
 '''
         expected_3 = [Token((INDENT, '    ', (3, 0), (3, 4), "    assert foo==bar(bat='baz')\n")),
                       Token((NAME, 'assert ', (3, 4), (3, 11), "    assert foo==bar(bat='baz')\n")),
@@ -157,12 +164,42 @@ def blah():
                       Token((NEWLINE, '\n', (4, 33), (4, 34), '    assert poo==far(fat=wowzer())\n'))]
         bag_of_bones = _build_bag_of_bones(data)
 
+        # TODO hmmm, screwed up something. seem to be modifying the origional
+        # somewhere rather than creating a copy.
+        #print('#'*80)
+        #pprint(bag_of_bones.funcdefs[0].body)
+        #print('-'*80)
+        #pprint(actual.funcdefs[0].body)
+
         # when
         actual = suppress_mutations(bag_of_bones)
 
         # then
         self.assertEqual(expected_3, actual.funcdefs[0].body[3])
         self.assertEqual(expected_4, actual.funcdefs[0].body[4])
+
+    def test_blank_lines_are_preserved_in_bdd_blocks(self):
+        # given
+        data = '''\
+def blah():
+    then:
+        foo == bar(bat='baz')
+        poo == far(fat=wowzer())
+
+def blaaa():
+    pass
+
+'''
+        expected_5 = [Token((NL, '\n', (5, 4), (5, 5), '    \n'))]
+
+        bag_of_bones = _build_bag_of_bones(data)
+
+        # when
+        actual = suppress_mutations(bag_of_bones)
+
+        # then
+        self.assertEqual(expected_5, actual.funcdefs[0].body[5])
+
 
 def _build_bag_of_bones(data):
     original_tokens = generate_toks(data)

@@ -1,6 +1,6 @@
 import re
-from token import NAME, INDENT, OP, NEWLINE, STRING
-from tokenize import COMMENT
+from token import NAME, INDENT, OP, STRING, NEWLINE
+from tokenize import COMMENT, NL
 
 from bones.containers.bag_of_bones import BagOfBones
 from bones.containers.bones_token import Token
@@ -50,14 +50,22 @@ def _transform_then_block_to_python(then_block):
 
 
 def _prepend_assert_to_line(line):
-    # If the first token of this line is an indent, which it will be for the first line after a bdd kw,
-    # then the insert index is 1, if the first token is not and INDENT, then the insert point is 0
+
+    # Must preserve the indent on lines that start with indents.
+    insert_index = 1 if line[0].type == INDENT else 0
+    #
     # def foo():
     #     then:
-    #         w == x # This line WILL have an INDENT token
-    #         y == z # This line WILL NOT have an INDENT token
-    insert_index = 1 if line[0].type == INDENT else 0
-    line.insert(insert_index, Token((NAME, 'assert ', (line[0].line_num, 0), (line[0].line_num, 0), '')))
+    #         w == x # This line WILL have an INDENT token, and we must keep it.
+    #         y == z # This line will NOT have an INDENT token.
+    #
+
+    if line[0].type == NL:
+        # preserve linebreaks/spacing
+        return line
+    else:
+        line.insert(insert_index, Token((NAME, 'assert ', (line[0].line_num, 0), (line[0].line_num, 0), '')))
+
     return line
 
 

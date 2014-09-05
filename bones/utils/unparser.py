@@ -9,6 +9,13 @@ import os
 # We unparse those infinities to INFSTR.
 INFSTR = "1e" + repr(sys.float_info.max_10_exp + 1)
 
+def unparse(node):
+    fixed = ast.fix_missing_locations(node)
+    buffer = io.StringIO()
+    Unparser(fixed, buffer)
+    return buffer.getvalue()
+
+
 def interleave(inter, f, seq):
     """Call f on each item in seq, calling inter() in between.
     """
