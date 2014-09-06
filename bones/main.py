@@ -24,9 +24,9 @@ def main():
     bag_of_bones = parse_tokens(original_tokens)
     pythonized_bones = suppress_mutations(bag_of_bones)
 
-
     # TODO everything below this will go away, I just wanted to see it work.
     python_tokens = debone(pythonized_bones)
+
     executable_python = untokenize(python_tokens)
 
     nodes = ast.parse(executable_python)
@@ -49,11 +49,13 @@ def _setup_parser():
 # TODO this is going away
 def debone(bones):
     tokens = []
+
     for funcdef in bones.funcdefs:
         tokens.extend(debone_line(funcdef.signature))
-        keys = funcdef.body.keys()
-        for key in keys:
-            tokens.extend(debone_line(funcdef.body[key]))
+
+        for line in funcdef.body.lines():
+            tokens.extend(debone_line(line))
+
     return tokens
 
 
