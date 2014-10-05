@@ -1,3 +1,4 @@
+from pprint import pprint
 import unittest
 from unittest import TestCase
 from token import NAME, OP, STRING, NEWLINE, INDENT, DEDENT, NUMBER
@@ -196,6 +197,87 @@ def somefunc():
         self.assertEqual(expected_7, parsed.funcdefs[0].where_block[7])
         self.assertEqual(expected_8, parsed.funcdefs[0].where_block[8])
         self.assertEqual(expected_9, parsed.funcdefs[0].where_block[9])
+
+    def test_module_level_import_statements_are_parsed_correctly(self):
+        # given
+        data = '''\
+from pprint import pprint
+'''
+        expected = [
+            Token((NAME,'from',(1, 0),(1, 4),'from pprint import pprint\n')),
+            Token((NAME,'pprint',(1, 5),(1, 11),'from pprint import pprint\n')),
+            Token((NAME,'import',(1, 12),(1, 18),'from pprint import pprint\n')),
+            Token((NAME,'pprint',(1, 19),(1, 25),'from pprint import pprint\n')),
+            Token((NEWLINE,'\n',(1, 25),(1, 26),'from pprint import pprint\n'))
+        ]
+        tokens = generate_toks(data)
+
+        # when
+        parsed = parse_tokens(tokens)
+
+        # then
+        self.assertEqual(expected, parsed.module[1])
+
+
+    def test_module_level_variables_are_parsed_correctly(self):
+        # given
+        data = '''\
+x = 'whoot'
+'''
+        expected = [
+            Token((NAME,'x',(1, 0),(1, 1),"x = 'whoot'\n")),
+            Token((OP,'=',(1, 2),(1, 3),"x = 'whoot'\n")),
+            Token((STRING,"'whoot'",(1, 4),(1, 11),"x = 'whoot'\n")),
+            Token((NEWLINE,'\n',(1, 11),(1, 12),"x = 'whoot'\n"))
+        ]
+        tokens = generate_toks(data)
+
+        # when
+        parsed = parse_tokens(tokens)
+
+        # then
+        self.assertEqual(expected, parsed.module[1])
+
+
+    def test_oddly_placed_module_level_lines_are_captured(self):
+        # given
+        data = '''\
+
+x = 'whoot'
+
+def this_is_just_in_the_way():
+    pass
+
+from soooper.module import cool
+
+def more_cruft():
+    pass
+
+'''
+        expected_2 = [
+            Token((NAME,'x',(2, 0),(2, 1),"x = 'whoot'\n")),
+            Token((OP,'=',(2, 2),(2, 3),"x = 'whoot'\n")),
+            Token((STRING,"'whoot'",(2, 4),(2, 11),"x = 'whoot'\n")),
+            Token((NEWLINE,'\n',(2, 11),(2, 12),"x = 'whoot'\n"))
+        ]
+
+        expected_7 = [
+            Token((NAME,'from',(7, 0),(7, 4),'from soooper.module import cool\n')),
+            Token((NAME,'soooper',(7, 5),(7, 12),'from soooper.module import cool\n')),
+            Token((OP,'.',(7, 12),(7, 13),'from soooper.module import cool\n')),
+            Token((NAME,'module',(7, 13),(7, 19),'from soooper.module import cool\n')),
+            Token((NAME,'import',(7, 20),(7, 26),'from soooper.module import cool\n')),
+            Token((NAME,'cool',(7, 27),(7, 31),'from soooper.module import cool\n')),
+            Token((NEWLINE,'\n',(7, 31),(7, 32),'from soooper.module import cool\n'))
+        ]
+        tokens = generate_toks(data)
+
+        # when
+        parsed = parse_tokens(tokens)
+
+        # then
+        self.assertEqual(expected_2, parsed.module[2])
+        self.assertEqual(expected_7, parsed.module[7])
 
 
 if __name__ == '__main__':

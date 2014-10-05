@@ -2,3 +2,5 @@
 __pycache__
 ignoreme.py
 *.egg-info/
+/dist
+/build

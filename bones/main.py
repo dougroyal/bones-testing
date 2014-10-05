@@ -32,6 +32,9 @@ def main():
     nodes = ast.parse(executable_python)
     nodes = build_unitest(nodes)
 
+    from bones.utils.ast_inspector import unparse_ast
+    unparse_ast(nodes)
+
     AddSelfArgumentToTest().visit(nodes)
     RewriteAssertToSelfEquals().visit(nodes)
 
@@ -70,11 +73,25 @@ def debone_line(line):
 # TODO this is going away
 def _tmp_get_file():
     data = '''\
-def 'blah'():
-    x=y=0
-
-    then:
-        x == y
-    '''
+import sys
+'''
+#     data = '''\
+# import sys
+#
+# def 'blah'():
+#
+#     data = open('data.xml')
+#     from pprint import pprint
+#     # pprint(data.read())
+#
+#     x=y=0
+#
+#
+#     then:
+#         x == y
+#     '''
 
     return io.StringIO(data)
+
+if __name__ == '__main__':
+    main()

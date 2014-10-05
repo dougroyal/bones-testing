@@ -48,7 +48,8 @@ def parse_tokens(tokens):
         elif in_funcdef_body:
             _curr_funcdef(bones).body.add_token(tok)
 
-            # TODO raise exception on unknown tokens
+        else:
+            bones.module.add_token(tok)
 
     return bones
 
