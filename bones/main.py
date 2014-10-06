@@ -53,6 +53,9 @@ def _setup_parser():
 def debone(bones):
     tokens = []
 
+    # for line in bones.module:
+        # tokens.extend(debone_line(bones.module[line]))
+
     for funcdef in bones.funcdefs:
         tokens.extend(debone_line(funcdef.signature))
 

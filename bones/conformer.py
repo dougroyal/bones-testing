@@ -1,6 +1,7 @@
 import re
-from token import NAME, INDENT, OP, STRING, NEWLINE
+from token import NAME, INDENT
 from tokenize import COMMENT, NL
+from copy import copy
 
 from bones.containers.bag_of_bones import BagOfBones
 from bones.containers.bones_token import Token
@@ -10,6 +11,7 @@ from bones.utils.builder import build_line
 
 def suppress_mutations(bag_of_bones):
     new_bones = BagOfBones()
+    new_bones.module = copy(bag_of_bones.module)
 
     for i, orig_funcdef in enumerate(bag_of_bones.funcdefs):
         norm_funcdef = FuncDef()
