@@ -7,6 +7,8 @@ from bones.conformer import suppress_mutations
 from bones.token_parser import parse_tokens
 from bones.containers.bones_token import Token as BonesToken
 
+from pprint import pprint
+
 # TODO this will go away
 from bones.transformers.unittest_builder import build_unitest
 from bones.transformers.ast_transformer import AddSelfArgumentToTest, RewriteAssertToSelfEquals
@@ -22,6 +24,8 @@ def main():
 
     original_tokens = [BonesToken(t) for t in generate_tokens(file.readline)]
     bag_of_bones = parse_tokens(original_tokens)
+
+    pprint(bag_of_bones.module)
     pythonized_bones = suppress_mutations(bag_of_bones)
 
     # TODO everything below this will go away, I just wanted to see it work.
@@ -53,6 +57,10 @@ def _setup_parser():
 def debone(bones):
     tokens = []
 
+    for line in bones.module:
+        from pprint import pprint; pprint(line)
+        tokens.extend(debone_line(line))
+
     for funcdef in bones.funcdefs:
         tokens.extend(debone_line(funcdef.signature))
 
@@ -74,22 +82,19 @@ def debone_line(line):
 def _tmp_get_file():
     data = '''\
 import sys
-'''
-#     data = '''\
-# import sys
-#
-# def 'blah'():
-#
-#     data = open('data.xml')
-#     from pprint import pprint
-#     # pprint(data.read())
-#
-#     x=y=0
-#
-#
-#     then:
-#         x == y
-#     '''
+
+def 'blah'():
+
+    data = open('data.xml')
+    from pprint import pprint
+    # pprint(data.read())
+
+    x=y=0
+
+
+    then:
+        x == y
+    '''
 
     return io.StringIO(data)
 
