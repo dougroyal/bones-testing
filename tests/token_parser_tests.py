@@ -1,4 +1,3 @@
-from pprint import pprint
 import unittest
 from unittest import TestCase
 from token import NAME, OP, STRING, NEWLINE, INDENT, DEDENT, NUMBER
@@ -42,7 +41,7 @@ def something(foo, bar="baz", bat=metasyntactic_generator()):
         parsed = parse_tokens(tokens)
 
         # then
-        self.assertEqual(expected, parsed.funcdefs[0].signature)
+        self.assertEqual(expected, parsed.funcdefs[0].body.first_line)
 
 
     def test_string_funcdef_signature_is_parsed_correctly(self):
@@ -81,7 +80,7 @@ def "a cool string func"(a,b=c,d="e",f=g()):
         parsed = parse_tokens(tokens)
 
         # then
-        self.assertEqual(expected, parsed.funcdefs[0].signature)
+        self.assertEqual(expected, parsed.funcdefs[0].body.first_line)
 
     def test_tokens_are_parsed_into_funcdef_body(self):
         # given

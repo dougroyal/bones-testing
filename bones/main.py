@@ -1,11 +1,12 @@
 import io
 import ast
 import argparse
-from tokenize import generate_tokens, untokenize
+from token import ENDMARKER
+from tokenize import generate_tokens, untokenize, NL
 
 from bones.conformer import suppress_mutations
 from bones.token_parser import parse_tokens
-from bones.containers.bones_token import Token as BonesToken
+from bones.containers.bones_token import Token as BonesToken, Token
 
 # TODO this will go away
 from bones.transformers.unittest_builder import build_unitest
@@ -32,8 +33,8 @@ def main():
     nodes = ast.parse(executable_python)
     nodes = build_unitest(nodes)
 
-    from bones.utils.ast_inspector import unparse_ast
-    unparse_ast(nodes)
+    # from bones.utils.ast_inspector import unparse_ast
+    # unparse_ast(nodes)
 
     AddSelfArgumentToTest().visit(nodes)
     RewriteAssertToSelfEquals().visit(nodes)
@@ -53,14 +54,16 @@ def _setup_parser():
 def debone(bones):
     tokens = []
 
-    # for line in bones.module:
-        # tokens.extend(debone_line(bones.module[line]))
+    for line_num in bones.module.keys():
+        for tok in bones.module[line_num]:
+            # TODO do this in the token_parser
+            if tok.type not in [NL, ENDMARKER]:
+                tokens.append((tok.type, tok.value, tok.start, tok.end, tok.line))
 
     for funcdef in bones.funcdefs:
-        tokens.extend(debone_line(funcdef.signature))
-
         for line in funcdef.body.lines():
-            tokens.extend(debone_line(line))
+            for tok in line:
+                tokens.append((tok.type, tok.value, tok.start, tok.end, tok.line))
 
     return tokens
 
@@ -77,22 +80,19 @@ def debone_line(line):
 def _tmp_get_file():
     data = '''\
 import sys
-'''
-#     data = '''\
-# import sys
-#
-# def 'blah'():
-#
-#     data = open('data.xml')
-#     from pprint import pprint
-#     # pprint(data.read())
-#
-#     x=y=0
-#
-#
-#     then:
-#         x == y
-#     '''
+
+def 'blah'():
+
+    data = open('data.xml')
+    from pprint import pprint
+    # pprint(data.read())
+
+    x=y=0
+
+
+    then:
+        x == y
+    '''
 
     return io.StringIO(data)
 

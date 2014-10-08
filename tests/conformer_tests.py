@@ -1,8 +1,6 @@
 from unittest import TestCase
-import unittest
 from token import NAME, OP, NEWLINE, INDENT, NUMBER, STRING
 from tokenize import COMMENT, NL
-from pprint import pprint
 
 from bones.conformer import suppress_mutations
 from bones.token_parser import parse_tokens
@@ -39,8 +37,8 @@ def im_a_regular_function():
 
         actual = suppress_mutations(bag_of_bones)
 
-        self.assertEqual(expected_0, actual.funcdefs[0].signature)
-        self.assertEqual(expected_1, actual.funcdefs[1].signature)
+        self.assertEqual(expected_0, actual.funcdefs[0].first_line)
+        self.assertEqual(expected_1, actual.funcdefs[1].first_line)
 
     def test_funcdefs_with_bdd_blocks_are_prefixed_with_test_(self):
         # note: the prefix is 'test_' not 'test'
@@ -74,8 +72,8 @@ def im_a_regular_function():
 
         actual = suppress_mutations(bag_of_bones)
 
-        self.assertEqual(expected_0, actual.funcdefs[0].signature)
-        self.assertEqual(expected_1, actual.funcdefs[1].signature)
+        self.assertEqual(expected_0, actual.funcdefs[0].first_line)
+        self.assertEqual(expected_1, actual.funcdefs[1].first_line)
 
     def test_bdd_keywords_are_commented_out(self):
         # TODO, not sure if removing the tokens completely will screw up the untokenizer, so i'm leaving them in for now. Explore later.
@@ -230,7 +228,6 @@ x = 'is an important variable'
 
         # when
         actual = suppress_mutations(bag_of_bones)
-        pprint(bag_of_bones.module)
 
         # then
         self.assertEqual(expected_1, actual.module[1])
@@ -240,6 +237,3 @@ x = 'is an important variable'
 def _build_bag_of_bones(data):
     original_tokens = generate_toks(data)
     return parse_tokens(original_tokens)
-
-
-

@@ -18,9 +18,9 @@ def suppress_mutations(bag_of_bones):
         norm_funcdef.body = orig_funcdef.body
 
         # Fix funcdef signature
-        sig = _remove_heinous_characters(orig_funcdef.signature)
+        sig = _remove_heinous_characters_from_signature(orig_funcdef.body.first_line)
         sig = _prefix_test_to_tests(orig_funcdef, sig)
-        norm_funcdef.signature = sig
+        norm_funcdef.first_line = sig
 
         # Fix funcdef bdd keywords
         # TODO no reason for the if block
@@ -106,15 +106,14 @@ def _mk_comment(tok):
     return Token((COMMENT, '#'+tok.value, tok.start, tok.end, tok.line))
 
 
-def _remove_heinous_characters(sig_toks):
-    sig_toks.name_tok.type = NAME
-    sig_toks.name_tok.value = _correct_func_name(sig_toks.name_tok.value)
+def _remove_heinous_characters_from_signature(sig_toks):
+    sig_toks[1] = Token((NAME, _correct_func_name(sig_toks[1].value), sig_toks[1].start, sig_toks[1].end, sig_toks[1].line))
     return sig_toks
 
 
 def _prefix_test_to_tests(orig_fn, new_sig):
     if len(orig_fn.then_block) > 0:
-        new_sig.name_tok.value = 'test_' + new_sig.name_tok.value
+        new_sig[1] = Token((NAME, 'test_' + new_sig[1].value , new_sig[1].start, new_sig[1].end, new_sig[1].line))
 
     return new_sig
 
