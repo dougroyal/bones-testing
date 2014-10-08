@@ -1,16 +1,13 @@
 from token import INDENT
-from collections import OrderedDict
 
-from bones.containers.funcdef_sig import FuncDefSig
 from bones.containers.block import Block
 
 
-class FuncDef():
-    # TODO a funcdef should be a type of Block
+class FuncDef(Block):
 
     def __init__(self):
+        super().__init__()
         self._closing_dedent_col = None
-        self.signature = FuncDefSig()
         self.body = Block()
         self.then_block = Block()
         self.where_block = Block()

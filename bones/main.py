@@ -1,13 +1,12 @@
 import io
 import ast
 import argparse
-from tokenize import generate_tokens, untokenize
+from token import ENDMARKER
+from tokenize import generate_tokens, untokenize, NL
 
 from bones.conformer import suppress_mutations
 from bones.token_parser import parse_tokens
-from bones.containers.bones_token import Token as BonesToken
-
-from pprint import pprint
+from bones.containers.bones_token import Token as BonesToken, Token
 
 # TODO this will go away
 from bones.transformers.unittest_builder import build_unitest
@@ -25,7 +24,6 @@ def main():
     original_tokens = [BonesToken(t) for t in generate_tokens(file.readline)]
     bag_of_bones = parse_tokens(original_tokens)
 
-    pprint(bag_of_bones.module)
     pythonized_bones = suppress_mutations(bag_of_bones)
 
     # TODO everything below this will go away, I just wanted to see it work.
@@ -36,8 +34,8 @@ def main():
     nodes = ast.parse(executable_python)
     nodes = build_unitest(nodes)
 
-    from bones.utils.ast_inspector import unparse_ast
-    unparse_ast(nodes)
+    # from bones.utils.ast_inspector import unparse_ast
+    # unparse_ast(nodes)
 
     AddSelfArgumentToTest().visit(nodes)
     RewriteAssertToSelfEquals().visit(nodes)
@@ -57,15 +55,16 @@ def _setup_parser():
 def debone(bones):
     tokens = []
 
-    for line in bones.module:
-        from pprint import pprint; pprint(line)
-        tokens.extend(debone_line(line))
+    for line_num in bones.module.keys():
+        for tok in bones.module[line_num]:
+            # TODO do this in the token_parser
+            if tok.type not in [NL, ENDMARKER]:
+                tokens.append((tok.type, tok.value, tok.start, tok.end, tok.line))
 
     for funcdef in bones.funcdefs:
-        tokens.extend(debone_line(funcdef.signature))
-
         for line in funcdef.body.lines():
-            tokens.extend(debone_line(line))
+            for tok in line:
+                tokens.append((tok.type, tok.value, tok.start, tok.end, tok.line))
 
     return tokens
 

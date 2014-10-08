@@ -1,8 +1,6 @@
 from unittest import TestCase
-import unittest
 from token import NAME, OP, NEWLINE, INDENT, NUMBER, STRING
 from tokenize import COMMENT, NL
-from pprint import pprint
 
 from bones.conformer import suppress_mutations
 from bones.token_parser import parse_tokens
@@ -39,8 +37,8 @@ def im_a_regular_function():
 
         actual = suppress_mutations(bag_of_bones)
 
-        self.assertEqual(expected_0, actual.funcdefs[0].signature)
-        self.assertEqual(expected_1, actual.funcdefs[1].signature)
+        self.assertEqual(expected_0, actual.funcdefs[0].first_line)
+        self.assertEqual(expected_1, actual.funcdefs[1].first_line)
 
     def test_funcdefs_with_bdd_blocks_are_prefixed_with_test_(self):
         # note: the prefix is 'test_' not 'test'
@@ -74,8 +72,8 @@ def im_a_regular_function():
 
         actual = suppress_mutations(bag_of_bones)
 
-        self.assertEqual(expected_0, actual.funcdefs[0].signature)
-        self.assertEqual(expected_1, actual.funcdefs[1].signature)
+        self.assertEqual(expected_0, actual.funcdefs[0].first_line)
+        self.assertEqual(expected_1, actual.funcdefs[1].first_line)
 
     def test_bdd_keywords_are_commented_out(self):
         # TODO, not sure if removing the tokens completely will screw up the untokenizer, so i'm leaving them in for now. Explore later.
@@ -199,6 +197,41 @@ def blaaa():
 
         # then
         self.assertEqual(expected_5, actual.funcdefs[0].body[5])
+
+    def test_module_lines_are_preserved(self):
+        # given
+        data = '''\
+from mypackage import important
+
+def foo():
+    pass
+
+x = 'is an important variable'
+
+'''
+        expected_1 = [
+            Token((NAME,'from',(1, 0),(1, 4),'from mypackage import important\n')),
+            Token((NAME,'mypackage',(1, 5),(1, 14),'from mypackage import important\n')),
+            Token((NAME,'import',(1, 15),(1, 21),'from mypackage import important\n')),
+            Token((NAME,'important',(1, 22),(1, 31),'from mypackage import important\n')),
+            Token((NEWLINE,'\n',(1, 31),(1, 32),'from mypackage import important\n'))]
+
+
+        expected_6 = [
+            Token((NAME,'x',(6, 0),(6, 1),"x = 'is an important variable'\n")),
+            Token((OP,'=',(6, 2),(6, 3),"x = 'is an important variable'\n")),
+            Token((STRING,"'is an important variable'",(6, 4),(6, 30),"x = 'is an important variable'\n")),
+            Token((NEWLINE,'\n',(6, 30),(6, 31),"x = 'is an important variable'\n"))]
+
+
+        bag_of_bones = _build_bag_of_bones(data)
+
+        # when
+        actual = suppress_mutations(bag_of_bones)
+
+        # then
+        self.assertEqual(expected_1, actual.module[1])
+        self.assertEqual(expected_6, actual.module[6])
 
 
 def _build_bag_of_bones(data):

@@ -4,3 +4,4 @@ ignoreme.py
 *.egg-info/
 /dist
 /build
+data.xml
