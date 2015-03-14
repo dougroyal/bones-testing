@@ -23,6 +23,7 @@ setup(
     license='Python Software Foundation License',
     url='http://houseofquark.com/bones-testing',
     keywords='test',
+    test_suite = 'nose.collector',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=True,
