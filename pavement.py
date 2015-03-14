@@ -51,6 +51,21 @@ def bump_version():
     with open(path(pavement_file), 'w') as f:
         f.writelines(new_pavement_lines)
 
+@task
+def clean():
+    """ remove __pycache__ directories """
+    sh('find . -type d -name __pycache__ -exec rm -rf {} \;')
+
+
+@task
+def freeze():
+    """ pip freeze > requirements.txt, excluding development installs"""
+    dependencies = sh('pip freeze', capture=True).split(os.linesep)
+
+    with open('requirements.txt', 'w') as file:
+        for dep in dependencies:
+            if not dep.startswith('-e git'):
+                file.write(dep+'\n')
 
 def _build_new_version(old_version):
     new_version = old_version.split('.')
