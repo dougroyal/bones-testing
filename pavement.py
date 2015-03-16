@@ -1,37 +1,8 @@
-from setuptools import find_packages
-from paver.setuputils import setup
 from paver.easy import task, needs, sh, path
 import re
 import os
 
 VERSION = '0.1.0'
-
-requires = []
-
-setup(
-    name='bones-testing',
-    version=VERSION,
-    description='A behavior-driven testing framework',
-    long_description=open('README.rst').read(),
-    classifiers=[
-        'Programming Language :: Python',
-        'Topic :: Software Development :: Testing',
-        'License :: OSI Approved :: Python Software Foundation License',
-    ],
-    author='Doug Royal',
-    author_email='douglasroyal@gmail.com',
-    license='Python Software Foundation License',
-    url='http://houseofquark.com/bones-testing',
-    keywords='test',
-    test_suite = 'nose.collector',
-    packages=find_packages(),
-    include_package_data=True,
-    zip_safe=True,
-    install_requires=requires,
-    entry_points = {
-        'console_scripts': ['bones = bones.main:main']
-    },
-)
 
 
 @task
@@ -65,11 +36,10 @@ def freeze():
 
     with open('requirements.txt', 'w') as file:
         for dep in dependencies:
-            if not dep.startswith('-e git'):
+            if not dep.startswith('bones-testing'):
                 file.write(dep+'\n')
 
 def _build_new_version(old_version):
     new_version = old_version.split('.')
     new_version[1] = str(int(new_version[1])+1)
     return '.'.join(new_version)
-
