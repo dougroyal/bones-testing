@@ -8,30 +8,25 @@ def parse(tokens):
 
     for index, tok in enumerate(tokens):
 
-        if curr_container.is_my_dedent(tok):
-            curr_container.tokens.append(tok)
-            curr_container = curr_container.parent
-
-        elif _is_start_of_class_block(tok):
+        if _is_start_of_class_block(tok):
             curr_container = Block(block_type=CLASS, parent=module)
-            curr_container.tokens.append(tok)
             module.children.append(curr_container)
 
         elif _is_start_of_function_block(tok):
             func_block = Block(block_type=FUNCTION, parent=curr_container)
             curr_container.children.append(func_block)
             curr_container = func_block
-            curr_container.tokens.append(tok)
 
         elif _is_start_of_bdd_block(tok):
             bdd_block = Block(block_type=BDD_BLOCK, parent=curr_container)
             curr_container.children.append(bdd_block)
             curr_container = bdd_block
-            curr_container.tokens.append(tok)
 
-        else:
-            curr_container.tokens.append(tok)
 
+        curr_container.tokens.append(tok)
+
+        if curr_container.is_my_dedent(tok):
+            curr_container = curr_container.parent
 
     return module
 
