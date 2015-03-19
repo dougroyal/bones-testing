@@ -5,7 +5,7 @@ from bones.block import BDD_BLOCK
 
 
 def is_found(block):
-    return any([BDD_BLOCK == b.block_type for b in block.children])
+    return any(BDD_BLOCK == b.block_type for b in block.children)
 
 
 def suppress(block):
