@@ -1,3 +1,4 @@
+docopt==0.6.2
 Paver==1.2.4
 py==1.4.26
 pytest==2.6.4
