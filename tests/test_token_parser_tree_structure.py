@@ -1,4 +1,4 @@
-from bones.block import FUNCTION, CLASS, BDD_BLOCK
+from bones.mutant import FUNCTION, CLASS, BDD_BLOCK
 from bones.token_parser import parse
 
 

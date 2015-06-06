@@ -1,6 +1,6 @@
 from copy import copy
 from tokenize import TokenInfo
-from bones.block import Block, FUNCTION, BDD_BLOCK
+from bones.mutant import Mutant, FUNCTION, BDD_BLOCK
 from bones.suppressors.function.suppressor import suppress
 
 
@@ -10,7 +10,7 @@ def test_normal_func_def_returned_as_is():
         TokenInfo(type=1, string='def', start=(1, 0), end=(1, 3), line='def a_function():\n'),
         TokenInfo(type=1, string='a_function', start=(1, 4), end=(1, 14), line='def a_function():\n')
     ]
-    func_block = Block(block_type=FUNCTION, parent=None)
+    func_block = Mutant(block_type=FUNCTION, parent=None)
     func_block.tokens = copy(expected_tokens)
 
     # when
@@ -26,7 +26,7 @@ def test_sexy_func_def_returned_as_normal_python():
         TokenInfo(type=1, string='def', start=(1, 0), end=(1, 3), line='def "a sexy string function definition"():\n'),
         TokenInfo(type=3, string='"a sexy string function definition"', start=(1, 4), end=(1, 39), line='def "a sexy string function definition"():\n')
     ]
-    func_block = Block(block_type=FUNCTION, parent=None)
+    func_block = Mutant(block_type=FUNCTION, parent=None)
     func_block.tokens = copy(given_tokens)
     expected_tokens = [
         TokenInfo(type=1, string='def', start=(1, 0), end=(1, 3), line='def "a sexy string function definition"():\n'),
@@ -47,8 +47,8 @@ def test_string_functions_with_bdd_children_are_suppressed():
         TokenInfo(type=3, string='"a sexy test string function definition"', start=(1, 4), end=(1, 44), line='def "a sexy test string function definition"():\n')
     ]
 
-    func_block = Block(block_type=FUNCTION, parent=None)
-    func_block.children.append(Block(block_type=BDD_BLOCK, parent=func_block))
+    func_block = Mutant(block_type=FUNCTION, parent=None)
+    func_block.children.append(Mutant(block_type=BDD_BLOCK, parent=func_block))
 
 
     func_block.tokens = copy(given_tokens)

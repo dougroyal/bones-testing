@@ -17,7 +17,9 @@ def main():
     tokens = generate_tokens(f.readline)
     bag_of_bones = parse(tokens)
 
-    suppress_mutations(bag_of_bones)
+    healthy_bones = suppress_mutations(bag_of_bones)
+
+    from pprint import pprint;pprint(healthy_bones)
 
 
 if __name__ == '__main__':
