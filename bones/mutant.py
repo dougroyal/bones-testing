@@ -21,3 +21,8 @@ class Mutant:
             self._indents += 1
 
         return False
+
+    def __str__(self):
+        import pprint
+        return 'Mutant Type: {type}\nTokens: {tokens}'.format(type=self.block_type,
+                                                              tokens=pprint.pformat(self.tokens))

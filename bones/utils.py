@@ -16,9 +16,13 @@ def print_bones(block):
         print_bones(child)
 
 
+def tokens_from_string(s):
+    return generate_tokens(io.StringIO(s).readline)
+
+
 def print_tokens(file_content):
-    tokens = generate_tokens(io.StringIO(file_content).readline)
-    pprint([t for t in tokens])
+    tokens = tokens_from_string(file_content)
+    pprint(list(tokens))
 
 if __name__ == '__main__':
     print_tokens('''def "a sexy test string function definition"():
