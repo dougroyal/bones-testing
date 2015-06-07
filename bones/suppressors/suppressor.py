@@ -1,4 +1,4 @@
-from bones.mutant import MODULE, CLASS, FUNCTION, BDD_BLOCK
+from bones.suppressors.known_mutants import MODULE, CLASS, FUNCTION, BDD_BLOCK
 
 from bones.suppressors.function import suppressor as function_suppressor
 from bones.suppressors.module import suppressor as module_suppressor

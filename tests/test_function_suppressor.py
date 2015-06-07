@@ -1,6 +1,7 @@
 from copy import copy
 from tokenize import TokenInfo
-from bones.mutant import Mutant, FUNCTION, BDD_BLOCK
+from bones.mutant import Mutant
+from bones.suppressors.known_mutants import FUNCTION, BDD_BLOCK
 from bones.suppressors.function.suppressor import suppress
 
 

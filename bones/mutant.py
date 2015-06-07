@@ -1,13 +1,5 @@
 from token import INDENT, DEDENT
 
-# known mutants
-MODULE = 'module'
-CLASS = 'class'
-FUNCTION = 'function'
-BDD_BLOCK = 'bdd_block'
-
-BDD_BLOCK_TYPES = ['given', 'when', 'then']
-
 # This is a simply a node in a tree...mutant sounded more fun.
 class Mutant:
     def __init__(self, block_type, parent):

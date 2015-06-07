@@ -1,5 +1,6 @@
 from token import NAME
-from bones.mutant import Mutant, MODULE, CLASS, FUNCTION, BDD_BLOCK, BDD_BLOCK_TYPES
+from bones.mutant import Mutant
+from bones.suppressors.known_mutants import MODULE, CLASS, FUNCTION, BDD_BLOCK, BDD_BLOCK_TYPES
 
 
 def parse(tokens):

@@ -1,7 +1,7 @@
 from token import NAME
 from tokenize import TokenInfo
 
-from bones.mutant import BDD_BLOCK
+from bones.suppressors.known_mutants import BDD_BLOCK
 
 
 def is_found(block):
