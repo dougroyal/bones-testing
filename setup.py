@@ -12,11 +12,11 @@ setup(
     classifiers=[
         'Programming Language :: Python',
         'Topic :: Software Development :: Testing',
-        'License :: OSI Approved :: Python Software Foundation License',
+        'License :: OSI Approved :: Apache Software License',
     ],
     author='Doug Royal',
     author_email='douglasroyal@gmail.com',
-    license='Python Software Foundation License',
+    license='Apache Software License',
     url='http://houseofquark.com/bones-testing',
     keywords='test',
     packages=find_packages(),
