@@ -6,6 +6,7 @@ from tokenize import generate_tokens
 import docopt
 from bones.suppressors.suppressor import suppress_mutations
 from bones.token_parser import parse
+from bones.utils import print_bones
 
 
 def main():
@@ -19,7 +20,7 @@ def main():
 
     healthy_bones = suppress_mutations(bag_of_bones)
 
-    from pprint import pprint;pprint(healthy_bones)
+    print_bones(healthy_bones)
 
 
 if __name__ == '__main__':

@@ -8,7 +8,6 @@ def is_found(block):
 
 
 def suppress(block):
-
     # the first three tokens are a NAME, and OP,and a NEWLINE, so just remove them.
     block.tokens = block.tokens[3:]
     return block

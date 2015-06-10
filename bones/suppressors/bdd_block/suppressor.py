@@ -1,9 +1,8 @@
-from bones.suppressors.bdd_block import remove_bdd_block_labels
+from bones.suppressors.bdd_block import remove_bdd_block_labels, dedent_if_necessary
 
 
 def suppress(alpha_mutant):
-    print("BDD_BLOCK SUPPRESSOR")
-    known_mutations = [remove_bdd_block_labels]
+    known_mutations = [remove_bdd_block_labels, dedent_if_necessary]
     found_mutations = []
 
     for mutation in known_mutations:
