@@ -1,6 +1,6 @@
 from bones.mutant import Mutant
 from bones.suppressors.known_mutants import BDD_BLOCK
-from bones.suppressors.bdd_block.suppressor import suppress
+from bones.suppressors.suppressor import suppress_mutations
 from bones.utils import tokens_from_string
 
 
@@ -16,7 +16,16 @@ def test_bdd_labels_are_removed():
         pass
 ''')
 
-    assert expected_tokens == suppress(bdd_block).tokens
+    assert expected_tokens == suppress_mutations(bdd_block).tokens
+
+
+def test_IndexError_is_not_raised_when_there_are_no_bdd_tokens():
+    borked_bdd_block = _generate_bdd_block_from_string('')
+
+    # this would raise an IndexError if a len() check isn't done.
+    suppress_mutations(borked_bdd_block)
+
+    assert 1 == 1
 
 
 def _generate_bdd_block_from_string(s):

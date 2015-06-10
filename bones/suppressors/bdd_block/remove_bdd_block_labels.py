@@ -4,7 +4,9 @@ from bones.suppressors.known_mutants import BDD_BLOCK_TYPES
 
 
 def is_found(block):
-    return block.tokens[0].type == NAME and block.tokens[0].string in BDD_BLOCK_TYPES
+    return (len(block.tokens) > 0
+            and block.tokens[0].type == NAME
+            and block.tokens[0].string in BDD_BLOCK_TYPES)
 
 
 def suppress(block):

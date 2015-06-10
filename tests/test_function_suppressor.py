@@ -2,7 +2,7 @@ from copy import copy
 from tokenize import TokenInfo
 from bones.mutant import Mutant
 from bones.suppressors.known_mutants import FUNCTION, BDD_BLOCK
-from bones.suppressors.function.suppressor import suppress
+from bones.suppressors.suppressor import suppress_mutations
 
 
 def test_normal_func_def_returned_as_is():
@@ -15,7 +15,7 @@ def test_normal_func_def_returned_as_is():
     func_block.tokens = copy(expected_tokens)
 
     # when
-    returned = suppress(func_block)
+    returned = suppress_mutations(func_block)
 
     # then
     assert expected_tokens == returned.tokens
@@ -35,7 +35,7 @@ def test_sexy_func_def_returned_as_normal_python():
     ]
 
     # when
-    returned = suppress(func_block)
+    returned = suppress_mutations(func_block)
 
     # then
     assert expected_tokens == returned.tokens
@@ -59,7 +59,7 @@ def test_string_functions_with_bdd_children_are_suppressed():
     ]
 
     # when
-    returned = suppress(func_block)
+    returned = suppress_mutations(func_block)
 
     # then
     assert expected_tokens == returned.tokens

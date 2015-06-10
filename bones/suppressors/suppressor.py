@@ -12,11 +12,27 @@ suppressors = {
     CLASS: class_suppressor,
 }
 
-def suppress_mutations(alpha_mutant):
-    suppressors[alpha_mutant.block_type].suppress(alpha_mutant)
-    for child in alpha_mutant.children:
-        suppress_mutations(child)
 
-    return alpha_mutant
+def suppress_mutations(mutant):
+    known_mutations = suppressors[mutant.block_type].known_mutations
+    mutant = suppress_known_mutants(known_mutations, mutant)
+
+    for i, child in enumerate(mutant.children):
+        mutant.children[i] = suppress_mutations(child)
+
+    return mutant
+
+
+def suppress_known_mutants(known_mutations, mutant):
+    found_mutations = []
+
+    for mutation in known_mutations:
+        if mutation.is_found(mutant):
+            found_mutations.append(mutation)
+
+    for mutation in found_mutations:
+        mutant = mutation.suppress(mutant)
+
+    return mutant
 
 
