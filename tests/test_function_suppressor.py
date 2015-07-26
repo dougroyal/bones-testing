@@ -1,65 +1,61 @@
-from copy import copy
 from tokenize import TokenInfo
 from bones.mutant import Mutant
 from bones.suppressors.known_mutants import FUNCTION, BDD_BLOCK
 from bones.suppressors.suppressor import suppress_mutations
+from bones.utils import tokens_from_string
 
 
 def test_normal_func_def_returned_as_is():
-    # given
-    expected_tokens =[
-        TokenInfo(type=1, string='def', start=(1, 0), end=(1, 3), line='def a_function():\n'),
-        TokenInfo(type=1, string='a_function', start=(1, 4), end=(1, 14), line='def a_function():\n')
-    ]
-    func_block = Mutant(block_type=FUNCTION, parent=None)
-    func_block.tokens = copy(expected_tokens)
+    expected_tokens = _generate_function_node_tokens_from_string('''\
+def a_function(x):
+''')
+    func_block = _build_func_block(expected_tokens)
 
-    # when
     returned = suppress_mutations(func_block)
 
-    # then
     assert expected_tokens == returned.tokens
 
 
 def test_sexy_func_def_returned_as_normal_python():
-    # given
-    given_tokens =[
-        TokenInfo(type=1, string='def', start=(1, 0), end=(1, 3), line='def "a sexy string function definition"():\n'),
-        TokenInfo(type=3, string='"a sexy string function definition"', start=(1, 4), end=(1, 39), line='def "a sexy string function definition"():\n')
-    ]
-    func_block = Mutant(block_type=FUNCTION, parent=None)
-    func_block.tokens = copy(given_tokens)
-    expected_tokens = [
-        TokenInfo(type=1, string='def', start=(1, 0), end=(1, 3), line='def "a sexy string function definition"():\n'),
-        TokenInfo(type=1, string='a_sexy_string_function_definition', start=(1, 4), end=(1, 39), line='def "a sexy string function definition"():\n')
-    ]
+    given_tokens = _generate_function_node_tokens_from_string('''\
+def "a sexy string function definition"(x, x):
+''')
+    func_block = _build_func_block(given_tokens)
 
-    # when
+    expected_tokens = _generate_function_node_tokens_from_string('''\
+def a_sexy_string_function_definition(x, x):
+''')
+
     returned = suppress_mutations(func_block)
 
-    # then
     assert expected_tokens == returned.tokens
 
 
-def test_string_functions_with_bdd_children_are_suppressed():
-    # given
-    given_tokens = [
-        TokenInfo(type=1, string='def', start=(1, 0), end=(1, 3), line='def "a sexy test string function definition"():\n'),
-        TokenInfo(type=3, string='"a sexy test string function definition"', start=(1, 4), end=(1, 44), line='def "a sexy test string function definition"():\n')
-    ]
-
-    func_block = Mutant(block_type=FUNCTION, parent=None)
+def test_string_functions_with_bdd_children_is_prepended_with_the_word_test():
+    given_tokens = _generate_function_node_tokens_from_string('''\
+def "a func with bdd children"(foo=None, bar=1):
+''')
+    func_block = _build_func_block(given_tokens)
     func_block.children.append(Mutant(block_type=BDD_BLOCK, parent=func_block))
 
+    expected_tokens = _generate_function_node_tokens_from_string('''\
+def test_a_func_with_bdd_children(foo=None, bar=1):
+''')
 
-    func_block.tokens = copy(given_tokens)
-    expected_tokens = [
-        TokenInfo(type=1, string='def', start=(1, 0), end=(1, 3), line='def "a sexy test string function definition"():\n'),
-        TokenInfo(type=1, string='test_a_sexy_test_string_function_definition', start=(1, 4), end=(1, 44), line='def "a sexy test string function definition"():\n')
-    ]
-
-    # when
     returned = suppress_mutations(func_block)
 
-    # then
     assert expected_tokens == returned.tokens
+
+
+def _build_func_block(expected_tokens):
+    func_block = Mutant(block_type=FUNCTION, parent=None)
+    func_block.tokens = expected_tokens
+    return func_block
+
+
+def _generate_function_node_tokens_from_string(s):
+    # A function node in the bones tree will not have the
+    #   - the module's final ENDMARKER token (that token belongs in the root node)
+    #   - the functions DEDENT token (that also belongs to the parent node)
+    # so, remove it here too.
+    return list(tokens_from_string(s))[:-1]

@@ -61,8 +61,8 @@ def another_outer_func():
 # For token placement tests
 ###########################
 @pytest.fixture
-def tokens_with_normal_python():
-    file_content = '''\
+def normal_python():
+    return '''\
 from somewhere import rainbow
 friends = ['dog']
 
@@ -74,7 +74,11 @@ def a_journey(friends):
 destination = a_journey(friends)
 
 '''
-    return generate_tokens(StringIO(file_content).readline)
+
+
+@pytest.fixture
+def tokens_with_normal_python(normal_python):
+    return generate_tokens(StringIO(normal_python).readline)
 
 
 @pytest.fixture
