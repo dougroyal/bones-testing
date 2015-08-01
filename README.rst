@@ -1,19 +1,7 @@
-**Only tested with Python 3.4**
-
-How to play with this while it's under development:
-::
-
-    pyton setup.py develop
-    bones some_example_tests.py
-
 Bones Testing
 =============
 
-A behavior-driven testing framework for Python.
-
-The framework extends the Python to make writing testing simpler.
-
-Here's a basic example of how tests will be written (when the framework is done).
+Write your python tests like this:
 
 ::
 
@@ -29,6 +17,15 @@ Here's a basic example of how tests will be written (when the framework is done)
 
         then:
             a + b == c
+
+
+This is an exploratory framework which extends Python to make writing testing more delicious.
+
+How to play with this while it's under development:
+::
+
+    pyton setup.py develop
+    bones some_example_tests.py
 
 This framework is based on Groovy's Spock_.
 
