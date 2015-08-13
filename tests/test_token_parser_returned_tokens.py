@@ -1,9 +1,8 @@
 from tokenize import TokenInfo, DEDENT
-from tokenize import generate_tokens
+from bones.bones_tree import BonesNode
 
 from bones.token_parser import parse
 from bones.utils import tokens_from_string
-from bones.mutant import Mutant
 from bones.suppressors.known_mutants import FUNCTION
 
 
@@ -151,7 +150,7 @@ def _remove_placeholder_tokens(toks):
     return reduced_toks
 
 def _build_func_block(expected_tokens):
-    func_block = Mutant(block_type=FUNCTION, parent=None)
+    func_block = BonesNode(block_type=FUNCTION, parent=None)
     func_block.tokens = expected_tokens
     return func_block
 

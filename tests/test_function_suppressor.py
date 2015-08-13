@@ -1,5 +1,4 @@
-from tokenize import TokenInfo
-from bones.mutant import Mutant
+from bones.bones_tree import BonesNode
 from bones.suppressors.known_mutants import FUNCTION, BDD_BLOCK
 from bones.suppressors.suppressor import suppress_mutations
 from bones.utils import tokens_from_string
@@ -36,7 +35,7 @@ def test_string_functions_with_bdd_children_is_prepended_with_the_word_test():
 def "a func with bdd children"(foo=None, bar=1):
 ''')
     func_block = _build_func_block(given_tokens)
-    func_block.children.append(Mutant(block_type=BDD_BLOCK, parent=func_block))
+    func_block.children.append(BonesNode(block_type=BDD_BLOCK, parent=func_block))
 
     expected_tokens = _generate_function_node_tokens_from_string('''\
 def test_a_func_with_bdd_children(foo=None, bar=1):
@@ -48,7 +47,7 @@ def test_a_func_with_bdd_children(foo=None, bar=1):
 
 
 def _build_func_block(expected_tokens):
-    func_block = Mutant(block_type=FUNCTION, parent=None)
+    func_block = BonesNode(block_type=FUNCTION, parent=None)
     func_block.tokens = expected_tokens
     return func_block
 

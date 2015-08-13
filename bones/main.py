@@ -16,9 +16,9 @@ def main():
     f = open(file_name)
 
     tokens = generate_tokens(f.readline)
-    bag_of_bones = parse(tokens)
+    bones_tree = parse(tokens)
 
-    healthy_bones = suppress_mutations(bag_of_bones)
+    healthy_bones = suppress_mutations(bones_tree)
 
     print_bones(healthy_bones)
 

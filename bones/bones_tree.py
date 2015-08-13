@@ -1,7 +1,7 @@
 from token import INDENT, DEDENT
 
-# This is a simply a node in a tree...mutant sounded more fun.
-class Mutant:
+
+class BonesNode:
     def __init__(self, block_type, parent):
         self.parent = parent
         self.children = []  # classes, functions, and BDD blocks
@@ -24,5 +24,5 @@ class Mutant:
 
     def __str__(self):
         import pprint
-        return 'Mutant Type: {type}\nTokens: {tokens}'.format(type=self.block_type,
+        return 'BonesNode Type: {type}\nTokens: {tokens}'.format(type=self.block_type,
                                                               tokens=pprint.pformat(self.tokens))

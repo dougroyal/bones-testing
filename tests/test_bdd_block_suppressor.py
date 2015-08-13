@@ -1,4 +1,4 @@
-from bones.mutant import Mutant
+from bones.bones_tree import BonesNode
 from bones.suppressors.known_mutants import BDD_BLOCK
 from bones.suppressors.suppressor import suppress_mutations
 from bones.utils import tokens_from_string
@@ -29,7 +29,7 @@ def test_IndexError_is_not_raised_when_there_are_no_bdd_tokens():
 
 
 def _generate_bdd_block_from_string(s):
-    bdd_block = Mutant(block_type=BDD_BLOCK, parent=None)
+    bdd_block = BonesNode(block_type=BDD_BLOCK, parent=None)
     bdd_block.tokens = list(tokens_from_string(s))
     # An actual bdd_block built by the parser will not have
     #   - an INDENT token (that belongs to the parent node)
