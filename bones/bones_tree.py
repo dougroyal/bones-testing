@@ -8,17 +8,17 @@ class BonesNode:
         self.block_type = block_type  # MODULE, CLASS, FUNCTION, OR BDD_BLOCK
         self.tokens = []
 
-        self._indents = 0
+        self._indent_count = 0
 
     def is_my_dedent(self, tok):
-        if tok.type == DEDENT:
-            self._indents -= 1
+        if tok.type == DEDENT and self._indent_count is not 0:
+            self._indent_count -= 1
 
-            if self._indents == 0:
+            if self._indent_count == 0:
                 return True
 
         if tok.type == INDENT:
-            self._indents += 1
+            self._indent_count += 1
 
         return False
 
@@ -26,3 +26,12 @@ class BonesNode:
         import pprint
         return 'BonesNode Type: {type}\nTokens: {tokens}'.format(type=self.block_type,
                                                               tokens=pprint.pformat(self.tokens))
+
+
+def flatten(bones_tree):
+    tokens = bones_tree.tokens
+    for child in bones_tree.children:
+
+        tokens.extend(flatten(child))
+    return tokens
+

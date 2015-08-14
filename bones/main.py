@@ -2,11 +2,11 @@
 Usage:
     bones <FILE>
 """
-from tokenize import generate_tokens
+from tokenize import generate_tokens, untokenize
 import docopt
 from bones.suppressors.suppressor import suppress_mutations
 from bones.token_parser import parse
-from bones.utils import print_bones
+from bones import bones_tree
 
 
 def main():
@@ -16,11 +16,14 @@ def main():
     f = open(file_name)
 
     tokens = generate_tokens(f.readline)
-    bones_tree = parse(tokens)
+    bones_tree_root = parse(tokens)
 
-    healthy_bones = suppress_mutations(bones_tree)
+    healthy_bones = suppress_mutations(bones_tree_root)
 
-    print_bones(healthy_bones)
+    python_tokens = bones_tree.flatten(healthy_bones)
+
+    executable_python = untokenize(python_tokens)
+    exec(compile(executable_python, '', 'exec'))
 
 
 if __name__ == '__main__':
