@@ -1,4 +1,5 @@
-from token import DEDENT, INDENT, NAME
+from pprint import pprint
+from token import DEDENT, INDENT, NAME, ENDMARKER
 from tokenize import TokenInfo
 import pytest
 
@@ -28,8 +29,10 @@ def test_flatten_tree_returns_list_of_all_tokens():
     root_node = BonesNode(None, None)
     root_tok_1 = _create_token(string='root 1')
     root_tok_2 = _create_token(string='root 2')
+    endmarker = _create_token(ENDMARKER)
     root_node.tokens.append(root_tok_1)
     root_node.tokens.append(root_tok_2)
+    root_node.tokens.append(endmarker)
 
     child_1 = BonesNode(None, root_node)
     child_1_tok_1 = _create_token(string='child 1 1')
@@ -63,8 +66,6 @@ def test_flatten_tree_returns_list_of_all_tokens():
     root_node.children.append(child_2)
 
     expected = [
-        root_tok_1,
-        root_tok_2,
         child_1_tok_1,
         child_1_tok_2,
         child_1_tok_3,
@@ -75,6 +76,9 @@ def test_flatten_tree_returns_list_of_all_tokens():
         child_2_tok_2,
         child_2_tok_3,
         child_2_tok_4,
+        root_tok_1,
+        root_tok_2,
+        endmarker
     ]
 
     actual = bones_tree.flatten(root_node)
@@ -82,8 +86,24 @@ def test_flatten_tree_returns_list_of_all_tokens():
     assert expected == actual
 
 
-def _create_token(token_type=NAME, string=''):
-    return TokenInfo(token_type, string, (0, 0), (0, 0), '')
+def test_line_numbers_should_be_organized_in_ascending_order_starting_at_1():
+    given = [
+        _create_token(start=(9, 0), end=(9, 0)),
+        _create_token(start=(4, 0), end=(4, 0)),
+        _create_token(start=(1, 0), end=(1, 0))]
+
+    expected = [
+        _create_token(start=(1, 0), end=(1, 0)),
+        _create_token(start=(2, 0), end=(2, 0)),
+        _create_token(start=(3, 0), end=(3, 0))]
+
+    actual = bones_tree.fix_line_numbers(given)
+
+    assert expected == actual
+
+
+def _create_token(token_type=NAME, string='', start=(0,0), end=(0,0), line=''):
+    return TokenInfo(token_type, string, start, end, line)
 
 
 @pytest.fixture
