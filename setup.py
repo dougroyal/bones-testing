@@ -2,8 +2,6 @@ from setuptools import setup,  find_packages
 
 VERSION = '0.1.0'
 
-requires = []
-
 setup(
     name='bones-testing',
     version=VERSION,
@@ -22,7 +20,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=True,
-    install_requires=requires,
+    install_requires=open('requirements.txt').readlines(),
     entry_points = {
         'console_scripts': ['bones = bones.main:main']
     },
