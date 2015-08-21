@@ -13,18 +13,41 @@ def main():
     args = docopt.docopt(__doc__)
     file_name = args['<FILE>']
 
-    f = open(file_name)
+    _run_bones_tests(open(file_name))
 
-    tokens = generate_tokens(f.readline)
+
+def _run_bones_tests(file):
+    tokens = generate_tokens(file.readline)
     bones_tree_root = parse(tokens)
 
     healthy_bones = suppress_mutations(bones_tree_root)
-
     python_tokens = bones_tree.flatten(healthy_bones)
+    module = untokenize(python_tokens)
 
-    executable_python = untokenize(python_tokens)
-    exec(compile(executable_python, '', 'exec'))
+    exec(compile(module, '', 'exec'))
+
+
+def _fake_file():
+    import io
+    return io.StringIO('''\
+def 'blah'():
+    given:
+        x = 'foo'
+
+    when:
+        y = 'bar'
+
+    then:
+        print('#'*80)
+        print('executing from bones test: %s == %s' % (x, y))
+        print("... erm, not actually checking the assertion yet, but we're getting there.")
+        print('#'*80)
+        x == y
+
+test_blah()
+
+    ''')
 
 
 if __name__ == '__main__':
-    main()
+    _run_bones_tests(_fake_file())

@@ -1,4 +1,5 @@
 from token import NAME
+from tokenize import TokenInfo, COMMENT
 
 from bones.suppressors.known_mutants import BDD_BLOCK_TYPES
 
@@ -10,7 +11,12 @@ def is_found(block):
 
 
 def suppress(block):
-    # the first three tokens are a NAME, and OP,and a NEWLINE, so just remove them.
-    block.tokens = block.tokens[3:]
+    # the first three tokens are a NAME, and OP,and a NEWLINE.
+    # just comment them out
+    block.tokens[0] = _make_comment_token(block.tokens[0])
     return block
+
+
+def _make_comment_token(tok):
+    return TokenInfo(COMMENT, '#'+tok.string, tok.start, tok.end, tok.line)
 

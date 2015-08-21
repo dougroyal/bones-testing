@@ -120,4 +120,7 @@ class ImportantClass():
 def another_func():
     pass
 '''
-    return generate_tokens(StringIO(file_content).readline)
+    tokens_from_string(file_content)
+
+def tokens_from_string(s):
+    return generate_tokens(StringIO(s).readline)

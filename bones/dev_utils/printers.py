@@ -7,12 +7,11 @@ from pprint import pprint
 
 
 def print_bones(block):
+    print('\n%s'%block.block_type.upper())
+    for tok in block.tokens:
+        print("\t"+str(tok))
+
     for child in block.children:
-        print(child.block_type)
-
-        for tok in child.tokens:
-            print("\t"+str(tok))
-
         print_bones(child)
 
 

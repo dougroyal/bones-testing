@@ -1,5 +1,4 @@
 from token import INDENT, DEDENT
-from tokenize import TokenInfo
 
 
 class BonesNode:
@@ -29,32 +28,10 @@ class BonesNode:
                                                               tokens=pprint.pformat(self.tokens))
 
 
-def fix_line_numbers(bones_tokens: list) -> list:
-    """
-    :param bones_tokens: A list of TokenItem where the line numbers may not be in order.
-    :return: A list of TokenItem where the line numbers are in order starting with 1.
-    """
-    return [_create_token(index+1, tok) for index, tok in enumerate(bones_tokens)]
-
-
-def _create_token(index, tok):
-    start = (index, tok.start[1])
-    end = (index, tok.end[1])
-    return TokenInfo(tok.type, tok.string, start, end, tok.line)
-
 def flatten(bones_tree):
-    # The ENDMARKER needs to be at the end, so append the root tokens to flattened tokens.
-    root_tokens = bones_tree.tokens
-    bones_tree.tokens = []
-    tokens = _flatten(bones_tree)
-    tokens.extend(root_tokens)
-
-    return tokens
-
-
-def _flatten(bones_tree):
     tokens = bones_tree.tokens
     for child in bones_tree.children:
-        tokens.extend(_flatten(child))
-    return tokens
+        tokens.extend(flatten(child))
 
+    # Sort tokens based on their original line number (start[0]), and their column (end[1]) on that line.
+    return sorted(tokens, key=lambda tok: (tok.start[0], tok.end[1]))

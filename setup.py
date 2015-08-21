@@ -21,6 +21,7 @@ setup(
     include_package_data=True,
     zip_safe=True,
     install_requires=open('requirements.txt').readlines(),
+    tests_require=open('test-requirements.txt').readlines(),
     entry_points = {
         'console_scripts': ['bones = bones.main:main']
     },

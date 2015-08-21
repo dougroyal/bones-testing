@@ -2,7 +2,7 @@ from tokenize import TokenInfo, DEDENT
 from bones.bones_tree import BonesNode
 
 from bones.token_parser import parse
-from bones.utils import tokens_from_string
+from bones.tests.conftest import tokens_from_string
 from bones.suppressors.known_mutants import FUNCTION
 
 

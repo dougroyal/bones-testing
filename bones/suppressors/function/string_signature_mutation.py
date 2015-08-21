@@ -2,52 +2,52 @@ from token import STRING, NAME
 import re
 from tokenize import TokenInfo
 
-INVALID_NAME_CHARS_PATTERN=re.compile(r'[^0-9a-zA-Z_]+')
-DEF_TOKEN_POSITION=0
-FUNC_NAME_TOKEN_POSITION=1
+INVALID_NAME_CHARS_PATTERN = re.compile(r'[^0-9a-zA-Z_]+')
+DEF_TOKEN_POSITION = 0
+FUNC_NAME_TOKEN_POSITION = 1
 
 
-def is_found(block):
+def is_found(block: list) -> bool:
+    """
+    Test the tokens to see if the function's name is a string rather than a standard python name.
+
+    :param block: A function broken down into a list of TokenInfo
+    :type block: list of TokenInfo
+
+    :return: boolean based on whether the function uses a string as its function name
+    :rtype: bool
+    """
     return block.tokens[FUNC_NAME_TOKEN_POSITION].type == STRING
 
 
-def suppress(block):
+def suppress(block: list) -> list:
+    """
+    Convert the function's string name to a valid Python function name, and update all the function
+    tokens so their TokenInfo properties match the new function name.
+
+    :param block: A function broken down into a list of TokenInfo
+    :type block: list of TokenInfo
+
+    :return: A list of TokenInfo with a valid Python function name
+    :rtype: list of TokenInfo
+    """
     tok = block.tokens[1]
-
-
     old_func_name = tok.string
-    new_func_name = old_func_name[1:-1]  # strip quotes from string ... this is why order of suppression is important.
-    new_func_name = re.sub(INVALID_NAME_CHARS_PATTERN, '_', new_func_name)
+    new_func_name = _create_new_func_name(old_func_name)
 
     block.tokens[1] = TokenInfo(type=NAME, string=new_func_name, start=tok.start, end=tok.end, line=tok.line)
-
-    for index, tok in enumerate(block.tokens):
-        block.tokens[index] = _build_token_with_updated_line_value(index, tok, old_func_name, new_func_name)
 
     return block
 
 
-def _build_token_with_updated_line_value(index, tok, old_func_name, new_func_name):
+def _create_new_func_name(old_func_name: str) -> str:
+    """
+    :param old_func_name: The origional string based function name, which could contain any character.
+    :type old_func_name: str
 
-    new_line = tok.line.replace(old_func_name, new_func_name)
-
-    if index == DEF_TOKEN_POSITION:
-        # The def token won't be shifted to the left because it comes before the function name.
-        start_left_shift_amount = 0
-        end_left_shift_amount = 0
-    elif index == FUNC_NAME_TOKEN_POSITION:
-        # The func_name start wont change, but the end will
-        start_left_shift_amount = 0
-        end_left_shift_amount = 2
-    else:
-        # -2 from column because we removed two quotes (")
-        start_left_shift_amount = 2
-        end_left_shift_amount = 2
-
-    # tok.start[0] and tok.end[0] is the _line_ number
-    # tok.start[1] and tok.end[1] is the _column_ number
-    new_start = (tok.start[0],  int(tok.start[1]) - start_left_shift_amount)
-    new_end = (tok.end[0], int(tok.end[1]) - end_left_shift_amount)
-
-    return TokenInfo(type=tok.type, string=tok.string, start=new_start, end=new_end, line=new_line)
-
+    :return: A name which conforms to the standard rules for python function names
+    :rtype: str
+    """
+    new_func_name = old_func_name[1:-1]  # strip quotes from string ... this is why order of suppression is important.
+    new_func_name = re.sub(INVALID_NAME_CHARS_PATTERN, '_', new_func_name)
+    return new_func_name
